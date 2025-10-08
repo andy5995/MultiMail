@@ -36,7 +36,7 @@ extern "C" {
 */
 
 #ifdef SIGWINCH
-# if defined(NCURSES_VERSION_MAJOR) && (NCURSES_VERSION_MAJOR > 4)
+# if defined(NCURSES_VERSION_MAJOR) && (NCURSES_VERSION_MAJOR > 4) && !defined(NCURSES_SIGWINCH)
 #  define NCURSES_SIGWINCH
 # endif
 # ifndef KEY_RESIZE
