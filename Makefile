@@ -11,7 +11,7 @@ isrc = interfac
 ifeq ($(DEBUG),Y)
 	OPTS = -g -Wall -pedantic
 else
-	OPTS = -O2 -Wall -pedantic
+	OPTS = -O2 -Wall -pedantic -Wno-deprecated-declarations
 	POST = strip mm$(E)
 endif
 
