@@ -145,5 +145,6 @@ endif
 # because meson forbids files() from referencing a parent directory.
 if get_option('tests')
     mm_misc_src = files('mmail/misc.cc')
+    mm_qwkhdr_src = files('mmail/qwkhdr.cc')
     subdir('tests')
 endif

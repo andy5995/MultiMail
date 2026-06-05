@@ -1,0 +1,45 @@
+/*
+ * MultiMail offline mail reader
+ * QWK HEADERS.DAT parser (Synchronet extended headers)
+
+ Distributed under the GNU General Public License, version 3 or later. */
+
+#ifndef QWKHDR_H
+#define QWKHDR_H
+
+/* Parses a Synchronet HEADERS.DAT file: an .ini-style file whose sections are
+   named by the hex byte-offset of a message's header in MESSAGES.DAT, holding
+   long/extended header fields ("Sender", "Recipient", "Subject", "WhenWritten",
+   "Message-ID", the "Utf8" flag, etc.). Field lines use either ':' or '=' as
+   the key/value separator. This class is self-contained (no curses, no
+   globals) so it can be unit-tested in isolation. */
+
+class qwkHeaders {
+    struct field {
+        char *key, *value;
+        field *next;
+    };
+    struct section {
+        unsigned long offset;
+        field *fields;
+        section *next;
+    };
+    section *head;
+
+    section *findSection(unsigned long) const;
+
+ public:
+    qwkHeaders();
+    ~qwkHeaders();
+
+    // Parse null-terminated HEADERS.DAT text into this object.
+    void parse(const char *text);
+
+    // Is there a section for this MESSAGES.DAT (byte) offset?
+    bool has(unsigned long offset) const;
+
+    // Value for a key (case-insensitive) within a section, or 0 if absent.
+    const char *get(unsigned long offset, const char *key) const;
+};
+
+#endif
