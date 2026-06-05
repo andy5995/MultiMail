@@ -1,4 +1,4 @@
-name: Linux
+name: ASan
 
 on:
   push:
@@ -9,10 +9,8 @@ on:
     paths-ignore: [ '**.md' ]
 
 jobs:
-  build:
+  asan:
     runs-on: ubuntu-latest
-    env:
-      CXXFLAGS: -Werror
     steps:
     - uses: actions/checkout@v6
 
@@ -21,11 +19,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y meson ninja-build libncurses-dev
 
-    - name: Meson setup
-      run: meson setup builddir
+    - name: Meson setup (ASan + UBSan)
+      run: meson setup build-asan -Db_sanitize=address,undefined -Db_lundef=false
 
     - name: Build
-      run: meson compile -C builddir
+      run: meson compile -C build-asan
 
     - name: Test
-      run: meson test -C builddir
+      run: meson test -C build-asan
+      env:
+        ASAN_OPTIONS: abort_on_error=1
+        UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1

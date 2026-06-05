@@ -140,3 +140,10 @@ if md2man.found()
 else
     install_man('mm.1')
 endif
+
+# Unit tests. Source files under test are listed here (not in tests/meson.build)
+# because meson forbids files() from referencing a parent directory.
+if get_option('tests')
+    mm_misc_src = files('mmail/misc.cc')
+    subdir('tests')
+endif
