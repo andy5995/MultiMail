@@ -93,7 +93,7 @@ class pktreply : public reply_driver
         long msglen;
 
         upl_base(const char *);
-        ~upl_base();
+        virtual ~upl_base();    // deleted via base pointer in killLetter()
     } *uplListHead, *uplListCurrent;
 
     file_list *upWorkList;
