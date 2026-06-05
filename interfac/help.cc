@@ -8,6 +8,8 @@
 
 #include "interfac.h"
 
+#define ARRAY_SIZE(a) ((int) (sizeof (a) / sizeof (a)[0]))
+
 HelpWindow::HelpWindow()
 {
     menu = 0;
@@ -87,7 +89,7 @@ void HelpWindow::h_packetlist()
         "Touch file", "filter list"
     };
 
-    newHelpMenu(keys, func, 17);
+    newHelpMenu(keys, func, ARRAY_SIZE(keys));
 }
 
 void HelpWindow::h_arealist()
@@ -102,7 +104,7 @@ void HelpWindow::h_arealist()
        "all/subscribed/active", "prev non-empty", "next non-empty"
     };
 
-    newHelpMenu(keys, func, 9);
+    newHelpMenu(keys, func, ARRAY_SIZE(keys));
 }
 
 void HelpWindow::h_letterlist()
@@ -136,9 +138,9 @@ void HelpWindow::h_letterlist()
     };
 
     if (!mm.areaList->isReplyArea())
-        newHelpMenu(keys, func, 14);
+        newHelpMenu(keys, func, ARRAY_SIZE(keys));
     else
-        newHelpMenu(repkeys, repfunc, 11);
+        newHelpMenu(repkeys, repfunc, ARRAY_SIZE(repkeys));
 }
 
 void HelpWindow::h_letter(bool isAnsi)
