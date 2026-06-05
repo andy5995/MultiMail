@@ -6,12 +6,18 @@ project(
     meson_version: '>= 0.59.0',
     default_options: [
         'warning_level=3',
-        'cpp_std=c++17',
     ],
 )
 
 cc = meson.get_compiler('cpp')
 is_msvc = cc.get_id() == 'msvc'
+
+# Portability guardrail: hold GCC/Clang to c++98 so they reject accidental
+# C++11+ (the legacy 16-bit DOS/OS2 toolchains target a pre-modern subset).
+# MSVC has no cpp_std below c++14, so leave it at its default there. Applied
+# per target via override_options to stay meson-0.59 compatible; meson >= 1.3.0
+# could instead do default_options: 'cpp_std=c++98,c++14'.
+cpp98 = is_msvc ? [] : ['cpp_std=c++98']
 
 # config.h is hand-maintained (platform/compiler detection); meson only
 # flips the three feature toggles via -D guards. See config.h.
@@ -122,6 +128,7 @@ executable(
     mmail_src + interfac_src,
     include_directories: include_directories('.'),
     dependencies: deps,
+    override_options: cpp98,
     install: true,
 )
 
