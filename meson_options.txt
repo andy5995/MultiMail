@@ -1,0 +1,20 @@
+option(
+    'vanity_plate',
+    type: 'boolean',
+    value: true,
+    description: 'Show author info on the packet list (VANITY_PLATE)',
+)
+
+option(
+    'shadows',
+    type: 'boolean',
+    value: true,
+    description: 'Draw shadowed windows (USE_SHADOWS)',
+)
+
+option(
+    'tar_kludge',
+    type: 'boolean',
+    value: true,
+    description: 'Rearchive the whole file for tar/gz replies (TAR_KLUDGE)',
+)

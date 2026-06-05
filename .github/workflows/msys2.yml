@@ -1,0 +1,41 @@
+name: MSYS2
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      CXXFLAGS: -Werror
+    strategy:
+      matrix:
+        platform: [ 'UCRT64', 'CLANG64' ]
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.platform }}
+        update: true
+        cache: true
+        pacboy: >-
+          cc:p
+          meson:p
+          ninja:p
+          pkgconf:p
+          ncurses:p
+
+    - name: Meson setup
+      run: meson setup builddir
+
+    - name: Build
+      run: meson compile -C builddir

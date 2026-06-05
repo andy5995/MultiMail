@@ -1,0 +1,42 @@
+name: MSVC
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Install PDCurses via vcpkg
+      shell: pwsh
+      run: vcpkg install pdcurses:x64-windows
+
+    - name: Set up MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Install Meson and Ninja
+      run: pip install meson ninja
+
+    - name: Point the compiler at vcpkg's PDCurses
+      shell: pwsh
+      run: |
+        $vcpkg = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows"
+        "INCLUDE=$vcpkg\include;$env:INCLUDE" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "LIB=$vcpkg\lib;$env:LIB"             | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+
+    # No CXXFLAGS=/WX here: warning_level=3 maps to MSVC /W4, and PDCurses' old C
+    # headers emit warnings under /W4 that would fail an -Werror build.
+    - name: Meson setup
+      run: meson setup builddir
+
+    - name: Build
+      run: meson compile -C builddir

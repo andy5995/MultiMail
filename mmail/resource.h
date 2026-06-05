@@ -56,7 +56,7 @@ class resource : public baseconfig
     static const int startUp[], defInt[];
 
     char *resourceData[noOfStrings];
-    int resourceInt[noOfResources - noOfStrings];
+    int resourceInt[(int)noOfResources - (int)noOfStrings];
 
     void homeInit();
     void mmEachInit(int, const char *);

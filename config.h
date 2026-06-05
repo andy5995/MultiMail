@@ -10,15 +10,27 @@
 #define MM_VERNUM STR(MM_MAJOR) "." STR(MM_MINOR)
 #define MM_TOPHEADER MM_NAME "/%.16s v" MM_VERNUM
 
-#define USE_SHADOWS     // "Shadowed" windows
-#define VANITY_PLATE    // Author info -- undefine for longer packet list
+/* These three are on by default. The build system can turn any of them
+   off by predefining NO_USE_SHADOWS / NO_VANITY_PLATE / NO_TAR_KLUDGE
+   (meson: -Dshadows=false / -Dvanity_plate=false / -Dtar_kludge=false).
+   The legacy makefiles pass nothing, so they keep the defaults. */
+
+#ifndef NO_USE_SHADOWS
+# define USE_SHADOWS    // "Shadowed" windows
+#endif
+
+#ifndef NO_VANITY_PLATE
+# define VANITY_PLATE   // Author info -- undefine for longer packet list
+#endif
 
 /* With the default tar/gz compress command, leave this on. It causes the
    entire file to be rearchived when using that format, instead of just
    the .red file. If you replace the tar/gz command with something
    smarter (e.g., via a script), you can disable the kludge.
 */
-#define TAR_KLUDGE
+#ifndef NO_TAR_KLUDGE
+# define TAR_KLUDGE
+#endif
 
 /* ----- Some supported compilers ----- */
 

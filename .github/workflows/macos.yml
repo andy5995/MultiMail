@@ -1,0 +1,26 @@
+name: macOS
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      CXXFLAGS: -Werror
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Install dependencies
+      run: brew install meson ninja
+
+    - name: Meson setup
+      run: meson setup builddir
+
+    - name: Build
+      run: meson compile -C builddir
