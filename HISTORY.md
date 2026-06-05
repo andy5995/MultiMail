@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- Fixed an out-of-bounds read in the ANSI viewer (e.g. when showing a
+  bulletin), which could crash the reader.
+
 - Fixed a crash (heap corruption) when editing a saved reply.
 
 - Fixed a buffer over-read on blank lines in packet control files.

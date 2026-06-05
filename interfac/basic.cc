@@ -103,7 +103,10 @@ int Win::put(int y, int x, const char *z, int len)
     if ((-1 == len) || (len > limit))
         len = limit;
 
-    for (; *z && (counter < len); z++) {
+    // Check the length bound before dereferencing z: callers may pass a
+    // buffer that isn't NUL-terminated (e.g. AnsiLine::show's atext), so
+    // testing *z first would read one byte past the end.
+    for (; (counter < len) && *z; z++) {
         z2 = ((unsigned char) *z);
         switch (z2) {
 #ifndef ALLCHARSOK        // unprintable control codes
