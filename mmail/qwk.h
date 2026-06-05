@@ -88,10 +88,14 @@ class qwkreply : public pktreply
 
     bool qwke, greekqwk;
 
+    FILE *hdrFile;
+    bool hdrsWritten;
+
     bool getRep1(FILE *, upl_qwk *);
     void getReplies(FILE *);
     void addRep1(FILE *, upl_base *, int);
     void addHeader(FILE *);
+    void repFinish();
     void repFileName();
     const char *repTemplate(bool);
  public:

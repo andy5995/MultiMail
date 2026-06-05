@@ -822,6 +822,8 @@ bool pktreply::makeReply()
 
     fclose(repFile);
 
+    repFinish();
+
     // delete old packet
     deleteReplies();
 
@@ -833,6 +835,10 @@ bool pktreply::makeReply()
     clearDirectory(mm.res.get(UpWorkDir));
 
     return !result && checkForReplies();
+}
+
+void pktreply::repFinish()
+{
 }
 
 void pktreply::deleteReplies()
