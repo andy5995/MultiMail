@@ -93,6 +93,7 @@ mmail_src = files(
     'mmail/opx.cc',
     'mmail/pktbase.cc',
     'mmail/qwk.cc',
+    'mmail/qwkhdr.cc',
     'mmail/read.cc',
     'mmail/resource.cc',
     'mmail/soup.cc',

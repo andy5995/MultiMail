@@ -25,6 +25,7 @@ compress.obj
 pktbase.obj
 -Yo bw.obj
 qwk.obj
+qwkhdr.obj
 omen.obj
 soup.obj
 opx.obj

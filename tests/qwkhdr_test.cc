@@ -70,5 +70,20 @@ int main()
     CHECK(!empty.has(0x1a80));
     empty.parse(0);
 
+    // utf8ToLatin1: ASCII unchanged, Latin-1 range decoded, >0xFF -> '?'
+    char *u;
+    u = utf8ToLatin1("plain ascii");
+    CHECK_STR(u, "plain ascii");
+    delete[] u;
+    u = utf8ToLatin1("caf\xC3\xA9");        // "cafe'" with U+00E9 -> 0xE9
+    CHECK(strcmp(u, "caf\xE9") == 0);
+    delete[] u;
+    u = utf8ToLatin1("\xE2\x82\xAC");       // euro sign U+20AC -> '?'
+    CHECK_STR(u, "?");
+    delete[] u;
+    u = utf8ToLatin1("");
+    CHECK_STR(u, "");
+    delete[] u;
+
     return mm_test_report();
 }
