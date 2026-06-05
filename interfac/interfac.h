@@ -142,7 +142,7 @@ class Win
  public:
     Win(int, int, int, chtype);
     Win(int, int, int, coltype);
-    ~Win();
+    virtual ~Win();         // ShadowedWin/InfoWin are deleted via Win *
     void init(int, int, int);
     void Clear(chtype);
     void Clear(coltype);
