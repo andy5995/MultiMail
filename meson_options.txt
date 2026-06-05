@@ -18,3 +18,10 @@ option(
     value: true,
     description: 'Rearchive the whole file for tar/gz replies (TAR_KLUDGE)',
 )
+
+option(
+    'tests',
+    type: 'boolean',
+    value: true,
+    description: 'Build the unit tests',
+)
