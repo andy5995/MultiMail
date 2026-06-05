@@ -13,6 +13,9 @@ Revision History
 
 - Fixed a memory leak in the help window.
 
+- Choosing "Kill" for existing replies when opening a packet now asks for
+  confirmation first, so an accidental "K" no longer deletes them.
+
 - Read Synchronet HEADERS.DAT, when present, for full-length From/To/Subject
   in QWK packets (instead of the 25-character MESSAGES.DAT fields).
 
