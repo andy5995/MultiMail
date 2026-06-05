@@ -4,6 +4,10 @@ Revision History
 (in-progress)
 -------------
 
+- Fixed a crash (heap corruption) when editing a saved reply.
+
+- Fixed a buffer over-read on blank lines in packet control files.
+
 - The reading view now renders dates with a configurable "DateFormat"
   (a strftime string), defaulting to your locale ("%x %H:%M") instead of a
   fixed US m-d-y. Applies to QWK and .OPX packets and Blue Wave replies;
