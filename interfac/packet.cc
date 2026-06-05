@@ -449,8 +449,7 @@ void PacketListWindow::killPacket()
         Select();
 
         char tmp[128];
-        sprintf(tmp, "Do you really want to delete %.90s?",
-                packetList->getName());
+        sprintf(tmp, "Confirm delete: %.90s", packetList->getName());
 
         if (ui.confirmDelete(tmp)) {
             packetList->kill();
