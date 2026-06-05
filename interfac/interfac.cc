@@ -423,7 +423,7 @@ void Interface::newpacket()
 
     if (mm.checkForReplies()) {
         if (!WarningWindow("Existing replies found:", keepers)
-            && confirmDelete("Delete existing replies?"))
+            && confirmDelete("Confirm delete"))
             mm.deleteReplies();
         else {
             redraw();
