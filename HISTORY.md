@@ -4,6 +4,11 @@ Revision History
 (in-progress)
 -------------
 
+- Build system: switched to Meson for Unix/Linux, macOS, and Windows
+  (MSYS2 with ncurses, MSVC with PDCurses), with per-platform CI and a
+  unit-test suite (also run under AddressSanitizer/UBSan). The top-level
+  GNU Makefile was removed; the DOS/OS2 cross-compiler makefiles remain.
+
 - New "Viewer" keyword and "L" key in the letter window: open the current
   message in an external viewer -- a terminal pager like "less", or a GUI
   editor like "mousepad" -- so links can be clicked and text selected.

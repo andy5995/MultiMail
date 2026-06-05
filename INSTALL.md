@@ -4,68 +4,74 @@ MultiMail compilation and installation procedure
 These instructions assume that you're compiling MultiMail from source. For
 precompiled binaries, see the README files that accompany them instead.
 
-1. Make sure any needed packages are installed --
-    In addition to the MultiMail package itself, you'll also need InfoZip
-    or PKZIP (and/or LHA, ARJ, etc.) to uncompress the packets and
-    compress the replies. InfoZip is available from:
+On Unix, Linux, macOS, and Windows (via MSYS2 or MSVC), MultiMail builds with
+the Meson build system. For the 16-bit MS-DOS and OS/2 ports, see "Other
+compilers and platforms" near the end of this file.
 
-    <http://infozip.sf.net/>
+1. Make sure the needed packages are installed --
+    To build MultiMail you'll need a C++ compiler, Meson and Ninja, and a
+    curses library -- either ncurses, SysV curses (e.g., Solaris curses), or
+    PDCurses. You can get these from:
 
-    (PKZIP is the default for DOS; InfoZip is the default for other
-    platforms.) The programs should be installed somewhere in the PATH;
-    otherwise, the full path must be specified in ~/.mmailrc.
+        Meson:    <https://mesonbuild.com/>
+        ncurses:  <https://invisible-island.net/ncurses/>
+        PDCurses: <https://pdcurses.org/>
 
-    To compile MultiMail, you'll need curses -- either ncurses, SysV
-    curses (e.g., Solaris curses), or PDCurses. You can get ncurses from:
+    If using PDCurses, MultiMail requires version 3.6 or later. (On Linux, you
+    most likely already have ncurses, Meson, and Ninja in your package manager.)
 
-    <https://invisible-island.net/ncurses/>
+    At run time, you'll also need InfoZip or PKZIP (and/or LHA, ARJ, etc.) to
+    uncompress the packets and compress the replies. InfoZip is available from:
 
-    PDCurses is available at:
+        <http://infozip.sf.net/>
 
-    <https://pdcurses.org/>
+    (PKZIP is the default for DOS; InfoZip is the default for other platforms.)
+    These programs should be in the PATH; otherwise, the full path must be
+    specified in ~/.mmailrc.
 
-    (If you're using Linux, you probably already have ncurses and
-    InfoZip.)
+2. Configure and build --
+    From the top of the source tree:
 
-    If using PDCurses, MultiMail now requires version 3.6 or later.
+        meson setup builddir
+        meson compile -C builddir
 
-    The 16-bit MS-DOS Turbo C++ port also uses Ralf Brown's SPAWNO
-    library:
+    Meson finds curses automatically (via pkg-config, with a fallback search).
+    The resulting binary is builddir/mm .
 
-    <https://www.cs.cmu.edu/afs/cs.cmu.edu/user/ralf/pub/WWW/files.html>
+    Build options (pass to "meson setup", or change later with
+    "meson configure builddir"):
 
-2. Configure it (for compilation) --
-    Check the options and paths in the Makefile. If curses.h isn't in
-    the include path, change CURS_DIR as appropriate. You may also need
-    to change LIBS. These can be set on the command line, e.g. "make
-    CURS_DIR=/pdcurses".
+        -Dtests=false         Don't build the unit tests
+        -Dvanity_plate=false  Omit the author info on the packet list
+        -Dshadows=false       Don't draw shadowed windows
+        -Dtar_kludge=false    Don't rearchive the whole file for tar/gz replies
+        --buildtype=release   Optimized build (the default is a debug build)
 
-3. Compile MultiMail --
-    At the base directory, type: `make`
+3. Run it --
+    Type: `./builddir/mm`
+    (For Windows, set the MMAIL or HOME variable first, then run mm.)
 
-4. Run it --
-    Type: `./mm`
-    (For DOS, OS/2 or Windows, set the MMAIL or HOME variable, then run mm.)
+4. (Optional:) Run the tests --
+    Type: `meson test -C builddir`
 
-5. (Optional:) Configure it (for end user) --
-    Edit the ~/.mmailrc file. (For DOS, OS/2 or Windows, mmail.rc.)
+5. (Optional:) Install it system-wide --
+    Type: `meson install -C builddir`
+    to install the binary and man page under the prefix (default /usr/local,
+    which requires root). Pick a different location with, e.g.,
+    "meson setup builddir --prefix ~/.local".
 
-6. (Optional:) Install it system-wide --
-    Type: `make install`
-    to install the manual and binary under /usr/local
-    (requires root access). (This doesn't work in DOS, OS/2 or Windows.)
+6. (Optional:) Configure it (for the end user) --
+    Edit the ~/.mmailrc file. (For Windows, mmail.rc.)
 
-See the [man page](MANUAL.md) and [README.md] for more information.
-
-This package includes some example color schemes, in the "colors"
-directory. To select one, use the "ColorFile" keyword in .mmailrc .
+This package includes some example color schemes, in the "colors" directory.
+To select one, use the "ColorFile" keyword in .mmailrc .
 
 
 Support for XCurses (PDCurses)
 ------------------------------
 
-When MultiMail is compiled with XCurses, you can use the X resource
-database to set certain startup options. Here are some example resources:
+When MultiMail is compiled with XCurses, you can use the X resource database
+to set certain startup options. Here are some example resources:
 
     XCurses*normalFont: 9x15
     XCurses*boldFont:   9x15bold
@@ -74,23 +80,30 @@ database to set certain startup options. Here are some example resources:
 
 For details, see the PDCurses documentation.
 
-If you're using a non-X text editor with an XCurses version of MultiMail,
-it will work better if you set MultiMail's editor variable to "xterm -e
-$EDITOR" instead of just "$EDITOR" (the default).
+If you're using a non-X text editor with an XCurses version of MultiMail, it
+will work better if you set MultiMail's editor variable to "xterm -e $EDITOR"
+instead of just "$EDITOR" (the default).
 
 
-Compile notes: Windows, MS-DOS, and OS/2
-----------------------------------------
+Other compilers and platforms
+------------------------------
 
-In the MultiMail source, separate makefiles are provided for these ports.
+Meson drives the modern builds: Unix/Linux and macOS with ncurses, and Windows
+with either MSYS2 (ncurses) or Microsoft Visual C++ (PDCurses). The continuous-
+integration workflows under .github/workflows/ show a working setup for each.
 
-    Makefile     - GCC (including DJGPP and MinGW)
-    Makefile.bcc - Borland C++ (Windows, MS-DOS)
-    Makefile.vc  - Microsoft Visual C++ (Windows)
-    Makefile.wcc - Watcom (All platforms -- Windows by default)
+The 16-bit MS-DOS and OS/2 ports are not built with Meson; they keep their own
+hand-maintained makefiles, which link against PDCurses:
 
-Point to your installation of PDCurses and compile with, e.g.:
+    Makefile.bcc - Borland/Turbo C++ (MS-DOS, Windows)
+    Makefile.wcc - Watcom (use "wmake")
+
+Point these at your PDCurses installation, e.g.:
 
     make -f Makefile.bcc CURS_DIR=/pdcurs38 SYS=DOS
 
-(Use "wmake" instead of "make" for Watcom; "nmake" for MSVC.)
+The 16-bit MS-DOS Turbo C++ port also uses Ralf Brown's SPAWNO library:
+
+    <https://www.cs.cmu.edu/afs/cs.cmu.edu/user/ralf/pub/WWW/files.html>
+
+See the [man page](MANUAL.md) and [README.md] for more information.
