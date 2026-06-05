@@ -13,6 +13,7 @@
 
 #ifdef __MSDOS__
 # define DEFEDIT "edit"
+# define DEFVIEWER "more"
 # define DEFZIP "pkzip -#"
 # define DEFUNZIP "pkunzip -# -o"
 # define DEFLHA "lha a /m"
@@ -20,11 +21,14 @@
 #else
 # ifdef __WIN32__
 #  define DEFEDIT "start /w notepad"
+#  define DEFVIEWER "more"
 # else
 #  ifdef __OS2__
 #   define DEFEDIT "tedit"
+#   define DEFVIEWER "more"
 #  else
 #   define DEFEDIT "vi"
+#   define DEFVIEWER "less"
 #  endif
 # endif
 # define DEFZIP "zip -jkq"
@@ -156,7 +160,7 @@ void baseconfig::processOneByName(const char *resName, const char *resValue)
 // ==============
 
 const int startUpLen =
- 51
+ 52
 #ifdef USE_SPAWNO
  + 1
 #endif
@@ -165,7 +169,7 @@ const int startUpLen =
 const char *resource::rc_names[startUpLen] =
 {
     "UserName", "InetAddr", "QuoteHead", "InetQuote",
-    "mmHomeDir", "TempDir", "signature", "editor",
+    "mmHomeDir", "TempDir", "signature", "editor", "Viewer",
     "PacketDir", "ReplyDir", "SaveDir", "AddressBook", "TaglineFile",
     "ColorFile", "UseColors", "Transparency", "BackFill",
     "arjUncompressCommand", "zipUncompressCommand",
@@ -208,6 +212,7 @@ const char *resource::rc_comments[startUpLen] = {
  "Signature (file) that should be appended to each message. (Not used\n"
  "# unless specified here.)",
  "Editor for replies = $EDITOR; or if not defined, " DEFEDIT,
+ "External viewer for a message (L key) = $PAGER, else " DEFVIEWER,
  MM_NAME " will look for packets here",
  "Reply packets go here",
  "Saved messages go in this directory, by default",
@@ -249,7 +254,7 @@ const char *resource::rc_comments[startUpLen] = {
 const int resource::startUp[startUpLen] =
 {
     UserName, InetAddr, QuoteHead, InetQuote, mmHomeDir, TempDir,
-    sigFile, editor, PacketDir, ReplyDir, SaveDir, AddressFile,
+    sigFile, editor, viewer, PacketDir, ReplyDir, SaveDir, AddressFile,
     TaglineFile, ColorFile, UseColors, Transparency, BackFill,
     arjUncompressCommand, zipUncompressCommand, lhaUncompressCommand,
     rarUncompressCommand, tarUncompressCommand, unknownUncompressCommand,
@@ -585,6 +590,9 @@ void resource::initinit()
 
     char *p = getenv("EDITOR");
     set(editor, (p ? p : DEFEDIT));
+
+    p = getenv("PAGER");
+    set(viewer, (p ? p : DEFVIEWER));
 }
 
 void resource::mmHomeInit()

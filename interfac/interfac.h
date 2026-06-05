@@ -502,6 +502,7 @@ class LetterWindow
     long reconvert(const char *);
     void write_header_to_file(FILE *);
     void write_to_file(FILE *);
+    void ViewExternal();
     void GetTagline();
     bool Previous();
     void NextDown();

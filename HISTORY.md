@@ -1,6 +1,14 @@
 Revision History
 ================
 
+(in-progress)
+-------------
+
+- New "Viewer" keyword and "L" key in the letter window: open the current
+  message in an external viewer -- a terminal pager like "less", or a GUI
+  editor like "mousepad" -- so links can be clicked and text selected.
+  Defaults to $PAGER, else "less" (Unix) or "more" (Windows/OS2).
+
 0.52 - 2019-04-01
 -----------------
 

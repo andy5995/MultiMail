@@ -911,6 +911,33 @@ void LetterWindow::write_to_file(FILE *fd)
         ui.setAnyRead();
 }
 
+void LetterWindow::ViewExternal()
+{
+    const char *cmd = mm.res.get(viewer);
+
+    if (!cmd || !*cmd) {
+        ui.nonFatalError("No viewer set (add a \"Viewer\" line to .mmailrc)");
+        return;
+    }
+
+    char *fname = mytmpnam();
+    FILE *fd = fopen(fname, "wt");
+
+    if (fd) {
+        write_header_to_file(fd);
+        for (int i = 0; i < NumOfLines; i++)
+            linelist[i]->out(fd);
+        fclose(fd);
+
+        mysystem2(cmd, fname);
+        remove(fname);
+        ui.redraw();
+    } else
+        ui.nonFatalError("Could not open a temporary file for the pager");
+
+    delete[] fname;
+}
+
 // For searches (may want to start at position == -1):
 void LetterWindow::setPos(int x)
 {
@@ -1009,6 +1036,9 @@ void LetterWindow::KeyHandle(int key)
         Save(1);
         DrawFlags();
         ReDraw();
+        break;
+    case 'L':
+        ViewExternal();
         break;
     case '?':
     case MM_F1:
