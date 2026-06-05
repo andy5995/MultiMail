@@ -30,6 +30,9 @@ endforeach
 if is_msvc
     add_project_arguments(
         '-D_CRT_SECURE_NO_WARNINGS',
+        # MSVC defines _WIN32, not __WIN32__; config.h keys its Windows paths
+        # (findfirst dir API, etc.) off __WIN32__. Matches the legacy Makefile.vc.
+        '-D__WIN32__',
         language: 'cpp',
     )
 else
