@@ -410,10 +410,12 @@ void Interface::newpacket()
 {
     file_header *hello, **bulletins;
     static const char *keepers[] = {"Save", "Kill"};
+    static const char *noyes[] = {"No", "Yes"};
     unsaved_reply = any_read = false;
 
     if (mm.checkForReplies()) {
-        if (!WarningWindow("Existing replies found:", keepers))
+        if (!WarningWindow("Existing replies found:", keepers)
+            && !WarningWindow("Delete existing replies?", noyes))
             mm.deleteReplies();
         else {
             redraw();
