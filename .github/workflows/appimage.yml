@@ -1,0 +1,99 @@
+name: Build AppImage
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version number'
+        required: false
+        type: string
+  push:
+    tags:
+      - 'v*'
+    branches: master
+
+  pull_request:
+    branches: master
+    paths:
+      - '.github/workflows/appimage.yml'
+      - 'packaging/appimage/**'
+
+jobs:
+  build-appimage:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04-arm
+          - ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set version
+        run: |
+          if [[ -z "${VERSION}" ]]; then
+            if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+              TAG_NAME=${GITHUB_REF#refs/tags/}
+              VERSION=${TAG_NAME#v}
+            else
+              VERSION=snapshot
+            fi
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          fi
+
+      - name: Build AppImage
+        run: |
+          docker compose -f packaging/appimage/docker-compose.yml run --rm build
+
+      - name: Create sha256sum
+        run: |
+          ARCH=$(uname -m)
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+          cd out
+          file=$(ls *.AppImage)
+          sha256sum "$file" > "$file.sha256sum";
+
+      - name: Artifact Filename
+        run: echo "ARTIFACT_NAME=MultiMail-appImage-${ARCH//\//-}" >> $GITHUB_ENV
+
+      - if: ${{ github.ref != 'refs/heads/master' }}
+        name: Upload AppImage
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ./out/*AppImage*
+          if-no-files-found: error
+
+      - name: Release (Tagged)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./out/*AppImage*"
+          allowUpdates: true
+          prerelease: false
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ github.ref == 'refs/heads/master' }}
+        name: 'Prerelease'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./out/*AppImage*"
+          body: "MultiMail Snapshot Release"
+          allowUpdates: true
+          prerelease: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          tag: snapshot
