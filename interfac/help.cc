@@ -10,6 +10,7 @@
 
 HelpWindow::HelpWindow()
 {
+    menu = 0;
     baseReset();
 }
 
@@ -245,17 +246,11 @@ void HelpWindow::MakeActive()
 
 void HelpWindow::Delete()
 {
-    switch (ui.active()) {
-    case ansi_help:
-    case letter_help:
-        delete (ShadowedWin *) menu;
-        break;
-    case letterlist:
-    case arealist:
-    case packetlist:
-        delete menu;
-    default:;
-    }
+    // menu is a Win or a ShadowedWin; virtual ~Win() deletes either correctly.
+    // (The old ui.active()-based switch skipped littlearealist/address/tagwin,
+    // leaking the menu allocated for those states.)
+    delete menu;
+    menu = 0;
 }
 
 void HelpWindow::baseNext()
