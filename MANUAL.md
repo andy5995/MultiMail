@@ -501,6 +501,15 @@ Here are the keywords and their functions:
   (although the Unix "EDITOR" environment variable is checked first),
   and is in no way a preferred editor; you can and should change it.
 
+`Viewer`
+  The external program used by the "L" key in the letter window to view
+  the current message, along with any command-line options. This can be a
+  terminal pager (such as "less") or a GUI text editor (such as "mousepad"
+  or Notepad); the message is written to a temporary file and opened in
+  this program. Most terminals and editors will then let you click links
+  and select/copy text. Defaults to the "PAGER" environment variable if
+  set, otherwise "less" (Unix) or "more" (Windows/OS2).
+
 `PacketDir`
   Default packet directory.
 
