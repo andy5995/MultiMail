@@ -452,7 +452,7 @@ void PacketListWindow::killPacket()
         sprintf(tmp, "Do you really want to delete %.90s?",
                 packetList->getName());
 
-        if (ui.WarningWindow(tmp)) {
+        if (ui.confirmDelete(tmp)) {
             packetList->kill();
             noFiles = packetList->getNoOfFiles();
         }

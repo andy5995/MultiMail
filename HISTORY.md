@@ -16,6 +16,9 @@ Revision History
 - Choosing "Kill" for existing replies when opening a packet now asks for
   confirmation first, so an accidental "K" no longer deletes them.
 
+- The packet-delete confirmation in the packet list now defaults to "No"
+  (so Enter no longer deletes the highlighted packet).
+
 - Read Synchronet HEADERS.DAT, when present, for full-length From/To/Subject
   in QWK packets (instead of the 25-character MESSAGES.DAT fields).
 

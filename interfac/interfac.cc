@@ -264,6 +264,15 @@ int Interface::WarningWindow(const char *warning, const char **selectors,
     return (items - 1) - def_val;  // the order is inverted
 }
 
+// Yes/No confirmation for a destructive action, defaulting to "No".
+// Returns true only if the user explicitly chooses "Yes".
+bool Interface::confirmDelete(const char *prompt)
+{
+    static const char *noyes[] = {"No", "Yes"};
+
+    return !WarningWindow(prompt, noyes);
+}
+
 int Interface::savePrompt(const char *prompt1, char *filename)
 {
     ShadowedWin question(5, 60, (LINES >> 1) - 3, C_LLSAVEBORD);
@@ -410,12 +419,11 @@ void Interface::newpacket()
 {
     file_header *hello, **bulletins;
     static const char *keepers[] = {"Save", "Kill"};
-    static const char *noyes[] = {"No", "Yes"};
     unsaved_reply = any_read = false;
 
     if (mm.checkForReplies()) {
         if (!WarningWindow("Existing replies found:", keepers)
-            && !WarningWindow("Delete existing replies?", noyes))
+            && confirmDelete("Delete existing replies?"))
             mm.deleteReplies();
         else {
             redraw();

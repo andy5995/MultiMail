@@ -713,6 +713,7 @@ class Interface
     void main();
     void close();
     int WarningWindow(const char *, const char ** = 0, int = 2);
+    bool confirmDelete(const char *);
     int savePrompt(const char *, char *);
     void nonFatalError(const char *);
     void ReportWindow(const char *);
