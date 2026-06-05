@@ -13,6 +13,9 @@ Revision History
 
 - Fixed a memory leak in the help window.
 
+- Read Synchronet HEADERS.DAT, when present, for full-length From/To/Subject
+  in QWK packets (instead of the 25-character MESSAGES.DAT fields).
+
 - The reading view now renders dates with a configurable "DateFormat"
   (a strftime string), defaulting to your locale ("%x %H:%M") instead of a
   fixed US m-d-y. Applies to QWK and .OPX packets and Blue Wave replies;

@@ -11,3 +11,12 @@ test(
         include_directories: include_directories('..'),
     ),
 )
+
+test(
+    'qwkhdr',
+    executable(
+        'test_qwkhdr',
+        files('qwkhdr_test.cc') + mm_qwkhdr_src + mm_misc_src,
+        include_directories: include_directories('..'),
+    ),
+)

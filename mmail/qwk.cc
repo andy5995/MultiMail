@@ -29,6 +29,13 @@ unsigned char *onecomp(unsigned char *p, char *dest, const char *comp)
     return 0;
 }
 
+// Copy a HEADERS.DAT field value. When the section is flagged Utf8=true the
+// value is UTF-8, so convert it to Latin-1; otherwise copy it as-is.
+static char *hdrField(const char *s, bool utf8)
+{
+    return utf8 ? utf8ToLatin1(s) : strdupplus(s);
+}
+
 // -----------------------------------------------------------------
 // The qheader methods
 // -----------------------------------------------------------------
@@ -202,6 +209,8 @@ qwkpack::qwkpack() : pktbase()
         fatalError("Could not open MESSAGES.DAT");
 
     readIndices();
+
+    loadHeaders();
 
     listBulletins((const char (*)[13]) newsfile, 1);
 }
@@ -403,6 +412,23 @@ void qwkpack::readIndices()
     }
 }
 
+void qwkpack::loadHeaders()
+{
+    FILE *hdrFile = mm.workList->ftryopen("headers.dat");
+    if (!hdrFile)
+        return;
+
+    long size = mm.workList->getSize();
+    if (size > 0) {
+        char *buf = new char[size + 1];
+        size_t got = fread(buf, 1, size, hdrFile);
+        buf[got] = '\0';
+        headers.parse(buf);
+        delete[] buf;
+    }
+    fclose(hdrFile);
+}
+
 letter_header *qwkpack::getNextLetter()
 {
     static net_address nullNet;
@@ -434,9 +460,37 @@ letter_header *qwkpack::getNextLetter()
 
     currentLetter++;
 
-    return new letter_header(q.subject, q.to, q.from, q.date, 0,
-        q.refnum, letterID, q.msgnum, areaID, q.privat, q.msglen, this,
+    // Synchronet HEADERS.DAT: when this message's header offset has an
+    // extended-header section, use the full-length Sender/Recipient/Subject
+    // in place of the 25-char MESSAGES.DAT fields.
+    const char *lsubj = q.subject, *lto = q.to, *lfrom = q.from;
+    char *csubj = 0, *cto = 0, *cfrom = 0;
+
+    if (headers.has(pos)) {
+        const char *u = headers.get(pos, "Utf8");
+        bool utf8 = u && !strcasecmp(u, "true");
+
+        const char *hsender = headers.get(pos, "Sender");
+        const char *hrecip = headers.get(pos, "To");
+        const char *hsubj = headers.get(pos, "Subject");
+
+        if (hsender)
+            lfrom = cfrom = hdrField(hsender, utf8);
+        if (hrecip)
+            lto = cto = hdrField(hrecip, utf8);
+        if (hsubj)
+            lsubj = csubj = hdrField(hsubj, utf8);
+    }
+
+    letter_header *newLetter = new letter_header(lsubj, lto, lfrom, q.date,
+        0, q.refnum, letterID, q.msgnum, areaID, q.privat, q.msglen, this,
         nullNet, !(!(areas[areaID].attr & LATINCHAR)));
+
+    delete[] cfrom;
+    delete[] cto;
+    delete[] csubj;
+
+    return newLetter;
 }
 
 void qwkpack::getblk(int, long &offset, long blklen,

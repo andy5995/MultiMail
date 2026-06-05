@@ -10,6 +10,7 @@
 #define QWK_H
 
 #include "pktbase.h"
+#include "qwkhdr.h"
 
 #define ndxRecLen 5
 
@@ -53,6 +54,7 @@ class qwkpack : public pktbase
     char newsfile[1][13];
     char controlname[26];
     bool qwke, greekqwk;
+    qwkHeaders headers;         // Synchronet HEADERS.DAT, if present
 
     unsigned long MSBINtolong(unsigned const char *);
     void readControlDat();
@@ -60,6 +62,7 @@ class qwkpack : public pktbase
     void readToReader();
     bool externalIndex();
     void readIndices();
+    void loadHeaders();
 
     void getblk(int, long &, long, unsigned char *&, unsigned char *&);
     void postfirstblk(unsigned char *&, letter_header &);

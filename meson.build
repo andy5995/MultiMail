@@ -93,6 +93,7 @@ mmail_src = files(
     'mmail/opx.cc',
     'mmail/pktbase.cc',
     'mmail/qwk.cc',
+    'mmail/qwkhdr.cc',
     'mmail/read.cc',
     'mmail/resource.cc',
     'mmail/soup.cc',
@@ -145,5 +146,6 @@ endif
 # because meson forbids files() from referencing a parent directory.
 if get_option('tests')
     mm_misc_src = files('mmail/misc.cc')
+    mm_qwkhdr_src = files('mmail/qwkhdr.cc')
     subdir('tests')
 endif
