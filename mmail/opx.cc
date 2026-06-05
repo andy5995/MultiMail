@@ -170,9 +170,9 @@ letter_header *opxpack::getNextLetter()
 
     bool privat = getshort(mhead.f.attr) & OPX_PRIVATE;
 
-    char date[30];
-    strftime(date, 30, "%b %d %Y  %H:%M",
-             getdostime(getlong(mhead.f.date_written)));
+    char date[40];
+    struct tm t = *getdostime(getlong(mhead.f.date_written));
+    formatDate(date, sizeof date, &t, mm.res.get(dateFormat));
 
     currentLetter++;
 

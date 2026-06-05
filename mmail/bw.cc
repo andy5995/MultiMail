@@ -680,8 +680,9 @@ letter_header *bwreply::getNextLetter()
     upl_bw *current = (upl_bw *) uplListCurrent;
     time_t unixTime = (time_t) getlong(current->uplRec.unix_date);
 
-    char date[30];
-    strftime(date, 30, "%b %d %Y  %H:%M", localtime(&unixTime));
+    char date[40];
+    struct tm t = *localtime(&unixTime);
+    formatDate(date, sizeof date, &t, mm.res.get(dateFormat));
 
     int areaNo = getAreaFromTag((char *) current->uplRec.echotag);
 

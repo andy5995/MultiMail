@@ -47,5 +47,23 @@ int main()
     CHECK_STR(stripre("hello"), "hello");
     CHECK_STR(stripre("Reply"), "Reply");
 
+    // formatDate: an explicit strftime format is locale-independent
+    struct tm dt;
+    memset(&dt, 0, sizeof dt);
+    dt.tm_year = 126;   // 2026
+    dt.tm_mon = 5;      // June
+    dt.tm_mday = 5;
+    dt.tm_hour = 14;
+    dt.tm_min = 30;
+    char ds[40];
+    formatDate(ds, sizeof ds, &dt, "%Y-%m-%d %H:%M");
+    CHECK_STR(ds, "2026-06-05 14:30");
+    // mktime normalization fills the weekday: 2026-06-05 was a Friday
+    formatDate(ds, sizeof ds, &dt, "%a");
+    CHECK_STR(ds, "Fri");
+    // an empty format falls back to a non-empty locale rendering
+    formatDate(ds, sizeof ds, &dt, "");
+    CHECK(ds[0] != '\0');
+
     return mm_test_report();
 }

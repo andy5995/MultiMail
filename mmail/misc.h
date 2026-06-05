@@ -23,6 +23,7 @@ void putblong(unsigned char *, unsigned long);
 
 struct tm *getdostime(unsigned long);
 unsigned long mkdostime(struct tm *);
+void formatDate(char *, size_t, struct tm *, const char *);
 
 char *strnzcpy(char *, const char *, size_t);
 void cropesp(char *);

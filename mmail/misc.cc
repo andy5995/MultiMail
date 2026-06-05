@@ -96,6 +96,20 @@ unsigned long mkdostime(struct tm *unpacked)
     return packed;
 }
 
+// Format a broken-down time with a strftime() string (the user's DateFormat).
+// The tm is normalized first, so weekday/yearday-based formats work too.
+void formatDate(char *dest, size_t destlen, struct tm *t, const char *fmt)
+{
+    if (!fmt || !*fmt)
+        fmt = "%x %H:%M";
+
+    t->tm_isdst = -1;
+    mktime(t);
+
+    if (!strftime(dest, destlen, fmt, t))
+        *dest = '\0';
+}
+
 // copy at most len chars, and null-terminate
 char *strnzcpy(char *dest, const char *source, size_t len)
 {
