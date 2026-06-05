@@ -1,0 +1,120 @@
+name: Windows installer
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version number'
+        required: false
+        type: string
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*'
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/windows-installer.yml'
+      - 'packaging/windows/**'
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        cache: true
+        pacboy: >-
+          cc:p
+          meson:p
+          ninja:p
+          pkgconf:p
+          pdcurses:p
+
+    - name: Build (PDCurses, release)
+      shell: msys2 {0}
+      run: |
+        meson setup _build --buildtype=release -Dstrip=true -Dtests=false
+        meson compile -C _build
+
+    - name: Stage installer files
+      shell: msys2 {0}
+      run: |
+        mkdir -p _staging
+        cp _build/mm.exe _staging/
+        cp -r colors _staging/
+        bash packaging/windows/collect-dlls.sh _staging/mm.exe _staging/
+
+    - name: Set version
+      shell: bash
+      run: |
+        if [[ -z "${VERSION}" ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${TAG#v}"
+          else
+            VERSION="snapshot"
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+        fi
+        echo "ARCH=x86_64" >> "$GITHUB_ENV"
+
+    - name: Build installer
+      shell: pwsh
+      run: |
+        iscc /DVERSION=$env:VERSION /DARCH=$env:ARCH packaging\windows\multimail.iss
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    - name: Checksum
+      shell: pwsh
+      run: |
+        $file = "MultiMail-$env:VERSION-windows-$env:ARCH-setup.exe"
+        $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+        "$hash  $file" | Out-File -Encoding ascii "$file.sha256sum"
+
+    - name: Upload artifact
+      if: github.ref != 'refs/heads/master'
+      uses: actions/upload-artifact@v7
+      with:
+        name: MultiMail-windows-installer
+        path: MultiMail-${{ env.VERSION }}-windows-${{ env.ARCH }}-setup.exe*
+        if-no-files-found: error
+
+    - name: Prerelease (master)
+      if: github.ref == 'refs/heads/master'
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "MultiMail-${{ env.VERSION }}-windows-${{ env.ARCH }}-setup.exe*"
+        body: "MultiMail Snapshot Release"
+        allowUpdates: true
+        prerelease: true
+        removeArtifacts: false
+        replacesArtifacts: true
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        tag: snapshot
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Release (tagged)
+      if: startsWith(github.ref, 'refs/tags/') || inputs.version != ''
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "MultiMail-${{ env.VERSION }}-windows-${{ env.ARCH }}-setup.exe*"
+        tag: ${{ inputs.version != '' && format('v{0}', env.VERSION) || '' }}
+        allowUpdates: true
+        prerelease: false
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        token: ${{ secrets.GITHUB_TOKEN }}
