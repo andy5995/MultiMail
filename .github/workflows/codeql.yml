@@ -1,0 +1,49 @@
+name: "CodeQL"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: master
+    paths:
+    - '**'
+    - '!**.yml'
+    - '!**.md'
+    - '**/codeql.yml'
+
+jobs:
+  analyze:
+    name: Analyze (cpp)
+    runs-on: ubuntu-latest
+    permissions:
+      # required to upload the analysis results
+      security-events: write
+      # required to fetch internal or private CodeQL packs
+      packages: read
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        # Fetch the immediate parent so a PR head can be checked out.
+        fetch-depth: 2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: 'cpp'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y meson ninja-build libncurses-dev
+
+    - name: Build
+      run: |
+        meson setup builddir
+        meson compile -C builddir
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:cpp"
