@@ -1,0 +1,13 @@
+# Legacy in-tree (makefile) build artifacts
+*.o
+/mm
+
+# Meson build directories
+/build/
+/builddir/
+/_build*/
+
+# AppImage build output
+/out/
+*.AppImage
+*.AppImage.zsync
