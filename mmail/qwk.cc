@@ -471,7 +471,7 @@ letter_header *qwkpack::getNextLetter()
         bool utf8 = u && !strcasecmp(u, "true");
 
         const char *hsender = headers.get(pos, "Sender");
-        const char *hrecip = headers.get(pos, "Recipient");
+        const char *hrecip = headers.get(pos, "To");
         const char *hsubj = headers.get(pos, "Subject");
 
         if (hsender)
