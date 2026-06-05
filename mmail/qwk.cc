@@ -644,6 +644,8 @@ qwkreply::qwkreply() : pktreply()
 {
     qwke = ((qwkpack *) mm.packet)->isQWKE();
     greekqwk = ((qwkpack *) mm.packet)->isGreekQWK();
+    hdrFile = 0;
+    hdrsWritten = false;
 }
 
 qwkreply::~qwkreply()
@@ -808,12 +810,17 @@ void qwkreply::enterLetter(letter_header &newLetter,
     addUpl(newList);
 }
 
-void qwkreply::addRep1(FILE *rep, upl_base *node, int)
+void qwkreply::addRep1(FILE *rep, upl_base *node, int c)
 {
     FILE *replyFile;
     upl_qwk *l = (upl_qwk *) node;
     long count = 0;
     char linebreak = greekqwk ? ((char) 12) : ((char) 227);
+
+    if (c == 0) {
+        hdrFile = 0;
+        hdrsWritten = false;
+    }
 
     long headerpos = ftell(rep);
     l->qHead.output(rep);
@@ -830,6 +837,20 @@ void qwkreply::addRep1(FILE *rep, upl_base *node, int)
         fprintf(rep, "Subject: %s%c", l->qHead.subject, linebreak);
     if (longfrom || longto || longsubj)
         fprintf(rep, "%c", linebreak);
+
+    if (longfrom || longto || longsubj) {
+        if (!hdrFile)
+            hdrFile = fopen("HEADERS.DAT", "wb");
+        if (hdrFile) {
+            fprintf(hdrFile, "[%lx]\r\n", (unsigned long) headerpos);
+            fprintf(hdrFile, "Utf8: false\r\n");
+            fprintf(hdrFile, "Sender: %s\r\n", l->qHead.from);
+            fprintf(hdrFile, "To: %s\r\n", l->qHead.to);
+            fprintf(hdrFile, "Subject: %s\r\n", l->qHead.subject);
+            fprintf(hdrFile, "\r\n");
+            hdrsWritten = true;
+        }
+    }
 
     replyFile = fopen(l->fname, "rt");
     if (replyFile) {
@@ -860,6 +881,14 @@ void qwkreply::addRep1(FILE *rep, upl_base *node, int)
     l->qHead.set_length(rep, headerpos, curpos);
 }
 
+void qwkreply::repFinish()
+{
+    if (hdrFile) {
+        fclose(hdrFile);
+        hdrFile = 0;
+    }
+}
+
 void qwkreply::addHeader(FILE *repFile)
 {
     char tmp[129];
@@ -882,9 +911,12 @@ void qwkreply::repFileName()
 
 const char *qwkreply::repTemplate(bool offres)
 {
-    static char buff[30];
+    static char buff[50];
 
     sprintf(buff, (offres && qwke) ? "%s TODOOR.EXT" : "%s", replyInnerName);
+
+    if (hdrsWritten)
+        sprintf(buff + strlen(buff), " HEADERS.DAT");
 
     return buff;
 }

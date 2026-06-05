@@ -22,6 +22,10 @@ Revision History
 - Read Synchronet HEADERS.DAT, when present, for full-length From/To/Subject
   in QWK packets (instead of the 25-character MESSAGES.DAT fields).
 
+- Write Synchronet HEADERS.DAT in QWK reply (.REP) packets so user-authored
+  From/To/Subject fields longer than 25 characters survive the round trip.
+  (https://github.com/wmcbrine/MultiMail/issues/22)
+
 - New "Ctrl-R" key in the packet list jumps to the reply directory, for
   browsing the saved reply (.REP) packets there.
 

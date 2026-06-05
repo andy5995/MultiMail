@@ -85,5 +85,27 @@ int main()
     CHECK_STR(u, "");
     delete[] u;
 
+    // Round-trip: the exact section format qwkreply::addRep1() writes for a
+    // reply with long fields must parse back through this reader. Keeps the
+    // REP write side (qwk.cc) and the read side from drifting apart.
+    const char *written =
+        "[80]\r\n"
+        "Utf8: false\r\n"
+        "Sender: A Sender Whose Name Exceeds 25 Characters\r\n"
+        "To: A Recipient Whose Name Also Exceeds 25 Characters\r\n"
+        "Subject: A subject line that is well past the 25-char limit\r\n"
+        "\r\n";
+
+    qwkHeaders rt;
+    rt.parse(written);
+    CHECK(rt.has(0x80));
+    CHECK_STR(rt.get(0x80, "Utf8"), "false");
+    CHECK_STR(rt.get(0x80, "Sender"),
+              "A Sender Whose Name Exceeds 25 Characters");
+    CHECK_STR(rt.get(0x80, "To"),
+              "A Recipient Whose Name Also Exceeds 25 Characters");
+    CHECK_STR(rt.get(0x80, "Subject"),
+              "A subject line that is well past the 25-char limit");
+
     return mm_test_report();
 }

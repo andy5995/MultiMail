@@ -110,6 +110,7 @@ class pktreply : public reply_driver
     void addUpl(upl_base *);
     virtual void addRep1(FILE *, upl_base *, int) = 0;
     virtual void addHeader(FILE *) = 0;
+    virtual void repFinish();
     virtual const char *repTemplate(bool) = 0;
  public:
     pktreply();
