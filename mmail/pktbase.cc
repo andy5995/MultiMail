@@ -472,7 +472,7 @@ char *pktbase::nextLine()
 
     char *end = myfgets(line, sizeof line, infile);
     if (end) {
-        while ((*end == '\n') || (*end == '\r'))
+        while ((end >= line) && ((*end == '\n') || (*end == '\r')))
             *end-- = '\0';
     } else
         line[0] = '\0';
