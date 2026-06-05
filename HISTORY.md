@@ -4,6 +4,12 @@ Revision History
 (in-progress)
 -------------
 
+- The reading view now renders dates with a configurable "DateFormat"
+  (a strftime string), defaulting to your locale ("%x %H:%M") instead of a
+  fixed US m-d-y. Applies to QWK and .OPX packets and Blue Wave replies;
+  Internet (SOUP/Usenet) and BBS-defined dates are still shown as received.
+  (upstream issue #6)
+
 - Build system: switched to Meson for Unix/Linux, macOS, and Windows
   (MSYS2 with ncurses, MSVC with PDCurses), with per-platform CI and a
   unit-test suite (also run under AddressSanitizer/UBSan). The top-level

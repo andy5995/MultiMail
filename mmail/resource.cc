@@ -160,7 +160,7 @@ void baseconfig::processOneByName(const char *resName, const char *resValue)
 // ==============
 
 const int startUpLen =
- 52
+ 53
 #ifdef USE_SPAWNO
  + 1
 #endif
@@ -169,7 +169,7 @@ const int startUpLen =
 const char *resource::rc_names[startUpLen] =
 {
     "UserName", "InetAddr", "QuoteHead", "InetQuote",
-    "mmHomeDir", "TempDir", "signature", "editor", "Viewer",
+    "mmHomeDir", "TempDir", "signature", "editor", "Viewer", "DateFormat",
     "PacketDir", "ReplyDir", "SaveDir", "AddressBook", "TaglineFile",
     "ColorFile", "UseColors", "Transparency", "BackFill",
     "arjUncompressCommand", "zipUncompressCommand",
@@ -213,6 +213,7 @@ const char *resource::rc_comments[startUpLen] = {
  "# unless specified here.)",
  "Editor for replies = $EDITOR; or if not defined, " DEFEDIT,
  "External viewer for a message (L key) = $PAGER, else " DEFVIEWER,
+ "Date/time format in the reading view (strftime; %x is your locale's date)",
  MM_NAME " will look for packets here",
  "Reply packets go here",
  "Saved messages go in this directory, by default",
@@ -254,7 +255,8 @@ const char *resource::rc_comments[startUpLen] = {
 const int resource::startUp[startUpLen] =
 {
     UserName, InetAddr, QuoteHead, InetQuote, mmHomeDir, TempDir,
-    sigFile, editor, viewer, PacketDir, ReplyDir, SaveDir, AddressFile,
+    sigFile, editor, viewer, dateFormat, PacketDir, ReplyDir, SaveDir,
+    AddressFile,
     TaglineFile, ColorFile, UseColors, Transparency, BackFill,
     arjUncompressCommand, zipUncompressCommand, lhaUncompressCommand,
     rarUncompressCommand, tarUncompressCommand, unknownUncompressCommand,
@@ -593,6 +595,8 @@ void resource::initinit()
 
     p = getenv("PAGER");
     set(viewer, (p ? p : DEFVIEWER));
+
+    set(dateFormat, "%x %H:%M");
 }
 
 void resource::mmHomeInit()

@@ -45,12 +45,26 @@ bool qheader::init(FILE *datFile)
     get_field(to, qh.to, 25);
     get_field(subject, qh.subject, 25);
 
-    memcpy(date, qh.date, 8);
-    date[2] = '-';
-    date[5] = '-';        // To deal with some broken messages
-    date[8] = ' ';
+    // qh.date ("MM-DD-YY") and qh.time ("HH:MM") are ASCII; render them with
+    // the user's DateFormat instead of the packet's US m-d-y order verbatim.
+    char dbuf[9], tbuf[6];
+    memcpy(dbuf, qh.date, 8);
+    dbuf[2] = dbuf[5] = '-';        // force separators (some packets are broken)
+    dbuf[8] = '\0';
+    memcpy(tbuf, qh.time, 5);
+    tbuf[5] = '\0';
 
-    strnzcpy(date + 9, qh.time, 5);
+    struct tm t;
+    memset(&t, 0, sizeof t);
+    int mo = 0, dy = 0, yr = 0, hh = 0, mn = 0;
+    sscanf(dbuf, "%d-%d-%d", &mo, &dy, &yr);
+    sscanf(tbuf, "%d:%d", &hh, &mn);
+    t.tm_mon = mo - 1;
+    t.tm_mday = dy;
+    t.tm_year = yr + ((yr < 70) ? 100 : 0);
+    t.tm_hour = hh;
+    t.tm_min = mn;
+    formatDate(date, sizeof date, &t, mm.res.get(dateFormat));
 
     strnzcpy(buf, qh.refnum, 8);
     refnum = atol(buf);
