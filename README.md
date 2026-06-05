@@ -1,98 +1,99 @@
-MultiMail
-=========
+# MultiMail
 
-MultiMail is an offline mail packet reader for Unix / Linux, MS-DOS,
-OS/2, Windows, macOS, and other systems, using a curses-based interface.
-It supports the Blue Wave, QWK, OMEN, SOUP and OPX formats.
+MultiMail is an offline mail packet reader with a curses-based interface,
+for Unix / Linux, macOS, Windows, and other systems. It reads and replies
+to messages in the Blue Wave, QWK, OMEN, SOUP, and OPX formats.
 
-MultiMail is free, open source software, distributed under the [GNU
-General Public License][gpl], version 3 or later.
+> This is a fork of MultiMail by [@andy5995][maintainer]. The original was
+> written by Kolossvary Tamas and Toth Istvan and maintained for many years
+> by [William McBrine][wmcbrine]; see [Credits](#credits). This fork adds a
+> Meson build, a unit-test suite, and a number of fixes and features on top
+> of the 0.52 base.
 
-You can get the latest version at:
-
-   <https://wmcbrine.com/MultiMail/>
-
-See [INSTALL] for the installation procedure, and the [man page] for
-information on usage.
+MultiMail is free software, distributed under the [GNU General Public
+License][gpl], version 3 or later.
 
 
-Version 0.52 - 2019-04-01
--------------------------
+## Features
 
-* Long To and From lines in QWKE replies
-* Blue Wave tear lines improved
-* Build and documentation cleanups
+Additions in this fork (see [HISTORY.md] for the full list):
 
-See the [HISTORY] file for other changes.
-
-
-Downloads
----------
-
-* Source code
-    - [TAR]
-    - [ZIP]
-* MS-DOS
-    - [x86-32][dos] Also works under Windows 9x, etc.
-    - [x86-16][xt]
-* OS/2
-    - [x86-32 VIO][os2] Needs at least OS/2 2.0.
-* Windows
-    - [x86-32 console][w32] Needs 9x or later (tested through 10).
-    - [x86-64 console][w64] Only tested on Windows 10.
-* macOS
-    - [x86-64 Terminal][mac] Only tested on macOS 10.14.
+* **Meson build system** for Unix/Linux, macOS, and Windows (MSYS2 with
+  ncurses, MSVC with PDCurses), with per-platform CI.
+* **Full-length QWK headers** via Synchronet's HEADERS.DAT -- both read
+  (To/From/Subject beyond the 25-character MESSAGES.DAT limit) and written
+  back into reply packets.
+* **Configurable date format** in the reading view (the `DateFormat`
+  keyword, a strftime string; defaults to your locale).
+* **External viewer** -- the `L` key opens the current message in a pager
+  or editor of your choice (the `Viewer` keyword), so links can be clicked
+  and text selected.
+* A **unit-test suite** (`meson test`), also run under
+  AddressSanitizer/UBSan, plus several memory-safety fixes.
 
 
-Mailing lists
--------------
+## Downloads
 
-Join the MultiMail [announce] list and/or the [discussion] list.
-
-
-Other links
------------
-
-* [Screen Shots]
-* [GitHub Page]
-* [SourceForge Page]
-* [Offline Formats]
+Prebuilt binaries, when available, are on the [releases page][releases].
+To build from source instead, see below.
 
 
-Credits
--------
+## Building
+
+You'll need a C++ compiler, Meson, Ninja, and a curses library (ncurses,
+SysV curses, or PDCurses 3.6+). From the top of the source tree:
+
+    meson setup builddir
+    meson compile -C builddir
+
+The binary is `builddir/mm`. To run the tests:
+
+    meson test -C builddir
+
+To install under the prefix (default `/usr/local`):
+
+    meson install -C builddir
+
+See [INSTALL.md] for build options, the 16-bit DOS/OS2 makefiles, and
+PDCurses/XCurses notes. At run time you'll also need an archiver such as
+InfoZip to unpack packets and pack replies.
+
+
+## Usage
+
+See the [man page][MANUAL] for usage, and edit `~/.mmailrc` (or `mmail.rc`
+on Windows) to configure the reader. Example color schemes are in the
+`colors` directory; select one with the `ColorFile` keyword.
+
+
+## Contributing
+
+Bug reports, suggestions, and pull requests are welcome on the
+[GitHub project][github]. Use the [issue tracker][issues] for problems and
+feature requests.
+
+
+## Credits
 
 MultiMail was originally developed under Linux by Kolossvary Tamas and
-Toth Istvan. John Zero was the maintainer for versions 0.2 through 0.6;
-since version 0.7, the maintainer is [William McBrine].
+Toth Istvan. John Zero maintained versions 0.2 through 0.6; from version
+0.7, [William McBrine][wmcbrine] was the maintainer, and his releases are
+the basis for this fork.
 
 Additional code has been contributed by Peter Krefting, Mark D. Rejhon,
-Ingo Brueckl, Robert Vukovic, and Frederic Cambus.
+Ingo Brueckl, Robert Vukovic, and Frederic Cambus. The QWK HEADERS.DAT
+work in this fork was done with input from Rob Swindell (Synchronet).
 
-Bug reports and suggestions are noted in the [HISTORY] file.
+Earlier bug reports and suggestions are noted in the [HISTORY.md] file.
 
 
 [gpl]: LEGAL.md
-[HISTORY]: HISTORY.md
-[INSTALL]: INSTALL.md
-[man page]: MANUAL.md
+[HISTORY.md]: HISTORY.md
+[INSTALL.md]: INSTALL.md
+[MANUAL]: MANUAL.md
 
-[TAR]: https://github.com/wmcbrine/MultiMail/archive/refs/tags/0.52.tar.gz
-[ZIP]: https://github.com/wmcbrine/MultiMail/archive/refs/tags/0.52.zip
-
-[dos]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmdos052.zip
-[xt]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmxt052.zip
-[os2]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmos2052.zip
-[w32]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmwin052.zip
-[w64]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmw64052.zip
-[mac]: https://github.com/wmcbrine/MultiMail/releases/download/0.52/mmmac052.zip
-
-[Screen Shots]: https://wmcbrine.com/mmail/snaps/
-[GitHub Page]: https://github.com/wmcbrine/MultiMail
-[SourceForge Page]: https://sourceforge.net/projects/multimail/
-[Offline Formats]: https://wmcbrine.com/mmail/specs/
-
-[announce]: https://lists.sourceforge.net/lists/listinfo/multimail-announce
-[discussion]: https://lists.sourceforge.net/lists/listinfo/multimail-user
-
-[William McBrine]: https://wmcbrine.com/
+[maintainer]: https://github.com/andy5995
+[github]: https://github.com/andy5995/MultiMail
+[issues]: https://github.com/andy5995/MultiMail/issues
+[releases]: https://github.com/andy5995/MultiMail/releases/latest
+[wmcbrine]: https://wmcbrine.com/MultiMail/
