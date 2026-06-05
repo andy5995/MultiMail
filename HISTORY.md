@@ -32,6 +32,27 @@ Revision History
   editor like "mousepad" -- so links can be clicked and text selected.
   Defaults to $PAGER, else "less" (Unix) or "more" (Windows/OS2).
 
+The following landed in the MultiMail repository
+(https://github.com/wmcbrine/MultiMail) after 0.52 but were never part of a
+tagged release; they ship here for the first time:
+
+- The ANSI viewer now handles Renegade/Telegard pipe color codes, including
+  the single-letter Celerity codes.
+
+- The ANSI viewer interprets Synchronet color codes; the letter viewer strips
+  them and skips Synchronet kludge lines.
+
+- Fixed crashes triggered by some malformed .NDX files.
+
+- Fixed a segfault on exit with the PDCurses/SDL backend.
+
+- An empty .MIX file is now tolerated instead of causing an abort.
+
+- Fixed reading back .PDQ reply files.
+
+- Preserve the case of existing .XTI and .FDX files, so duplicate copies are
+  not archived.
+
 0.52 - 2019-04-01
 -----------------
 
