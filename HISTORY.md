@@ -8,6 +8,8 @@ Revision History
 
 - Fixed a buffer over-read on blank lines in packet control files.
 
+- Fixed a memory leak in the help window.
+
 - The reading view now renders dates with a configurable "DateFormat"
   (a strftime string), defaulting to your locale ("%x %H:%M") instead of a
   fixed US m-d-y. Applies to QWK and .OPX packets and Blue Wave replies;
