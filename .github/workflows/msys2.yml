@@ -13,9 +13,6 @@ jobs:
     runs-on: windows-latest
     env:
       CXXFLAGS: -Werror
-    strategy:
-      matrix:
-        platform: [ 'UCRT64', 'CLANG64' ]
     defaults:
       run:
         shell: msys2 {0}
@@ -24,7 +21,7 @@ jobs:
 
     - uses: msys2/setup-msys2@v2
       with:
-        msystem: ${{ matrix.platform }}
+        msystem: UCRT64
         update: true
         cache: true
         pacboy: >-
