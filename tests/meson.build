@@ -9,6 +9,7 @@ test(
         'test_misc',
         files('misc_test.cc') + mm_misc_src,
         include_directories: include_directories('..'),
+        override_options: cpp98,
     ),
 )
 
@@ -18,5 +19,6 @@ test(
         'test_qwkhdr',
         files('qwkhdr_test.cc') + mm_qwkhdr_src + mm_misc_src,
         include_directories: include_directories('..'),
+        override_options: cpp98,
     ),
 )
