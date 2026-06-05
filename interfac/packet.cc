@@ -329,6 +329,12 @@ bool PacketListWindow::extrakeys(int key)
     case 'G':
         gotoDir();
         break;
+    case 18:            // ^R
+        if (newDir(mm.res.get(ReplyDir)))
+            ui.redraw();
+        else
+            ui.nonFatalError("Could not change to reply directory");
+        break;
     case 'R':
         renamePacket();
         break;

@@ -16,6 +16,9 @@ Revision History
 - Read Synchronet HEADERS.DAT, when present, for full-length From/To/Subject
   in QWK packets (instead of the 25-character MESSAGES.DAT fields).
 
+- New "Ctrl-R" key in the packet list jumps to the reply directory, for
+  browsing the saved reply (.REP) packets there.
+
 - The reading view now renders dates with a configurable "DateFormat"
   (a strftime string), defaulting to your locale ("%x %H:%M") instead of a
   fixed US m-d-y. Applies to QWK and .OPX packets and Blue Wave replies;

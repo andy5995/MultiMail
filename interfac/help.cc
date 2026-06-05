@@ -72,7 +72,7 @@ void HelpWindow::h_packetlist()
     static const char *keys[] = {
         "Q", "Enter", "S, $",
         "K", "/, .", "G",
-        "U", "R",
+        "^R", "U", "R",
 
         "A", "^T", "^Z",
         "B", "Space, F", "^X",
@@ -80,14 +80,14 @@ void HelpWindow::h_packetlist()
     }, *func[] = {
         "Quit", "select packet", "change Sort type",
         "Kill packet", "search / next", "Go to directory",
-         "Update list", "Rename packet",
+         "reply dir", "Update list", "Rename packet",
 
         "Addressbook", "Tagline editor", "command shell",
         "alias for PgUp", "aliases for PgDn", "eXit now",
         "Touch file", "filter list"
     };
 
-    newHelpMenu(keys, func, 16);
+    newHelpMenu(keys, func, 17);
 }
 
 void HelpWindow::h_arealist()
