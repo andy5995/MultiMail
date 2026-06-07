@@ -133,3 +133,6 @@ tagline.$(O): interfac/tagline.cc interfac/interfac.h \
   interfac/../mmail/../mmail/resource.h \
   interfac/../mmail/../interfac/mysystem.h interfac/mmcolor.h \
   interfac/isoconv.h interfac/tagline.h
+qheader.$(O): mmail/qheader.cc mmail/qwk.h mmail/pktbase.h mmail/mmail.h \
+  mmail/../config.h mmail/../mmail/misc.h mmail/../mmail/resource.h \
+  mmail/../interfac/mysystem.h mmail/qwkhdr.h

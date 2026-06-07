@@ -37,161 +37,6 @@ static char *hdrField(const char *s, bool utf8)
 }
 
 // -----------------------------------------------------------------
-// The qheader methods
-// -----------------------------------------------------------------
-
-bool qheader::init(FILE *datFile)
-{
-    qwkmsg_header qh;
-    char buf[9], *err;
-
-    if (!fread(&qh, 1, sizeof qh, datFile))
-        return false;
-
-    get_field(from, qh.from, 25);
-    get_field(to, qh.to, 25);
-    get_field(subject, qh.subject, 25);
-
-    // qh.date ("MM-DD-YY") and qh.time ("HH:MM") are ASCII; render them with
-    // the user's DateFormat instead of the packet's US m-d-y order verbatim.
-    char dbuf[9], tbuf[6];
-    memcpy(dbuf, qh.date, 8);
-    dbuf[2] = dbuf[5] = '-';        // force separators (some packets are broken)
-    dbuf[8] = '\0';
-    memcpy(tbuf, qh.time, 5);
-    tbuf[5] = '\0';
-
-    struct tm t;
-    memset(&t, 0, sizeof t);
-    int mo = 0, dy = 0, yr = 0, hh = 0, mn = 0;
-    sscanf(dbuf, "%d-%d-%d", &mo, &dy, &yr);
-    sscanf(tbuf, "%d:%d", &hh, &mn);
-    t.tm_mon = mo - 1;
-    t.tm_mday = dy;
-    t.tm_year = yr + ((yr < 70) ? 100 : 0);
-    t.tm_hour = hh;
-    t.tm_min = mn;
-    formatDate(date, sizeof date, &t, mm.res.get(dateFormat));
-
-    strnzcpy(buf, qh.refnum, 8);
-    refnum = atol(buf);
-
-    get_field(buf, qh.msgnum, 7);
-    msgnum = strtol(buf, &err, 10);
-    if (*err)
-        return false;    // bogus message
-
-    strnzcpy(buf, qh.chunks, 6);
-    msglen = (atol(buf) - 1) << 7;
-
-    privat = (qh.status == '*') || (qh.status == '+');
-
-    // Is this a block of net-status flags?
-    netblock = !qh.status || (qh.status == '\xff');
-
-    origArea = getshort(&qh.confLSB);
-
-    return true;
-}
-
-// Just the fields needed for building the index:
-bool qheader::init_short(FILE *datFile)
-{
-    qwkmsg_header qh;
-    char buf[9], *err;
-    long rawlen;
-
-    if (!fread(&qh, 1, sizeof qh, datFile))
-        return false;
-
-    get_field(to, qh.to, 25);
-
-    strnzcpy(buf, qh.chunks, 6);
-    rawlen = strtol(buf, &err, 10);
-    if ((*err && *err != ' ') || (rawlen < 2)) {
-        netblock = true;    // bad header, keep scanning
-        return true;
-    }
-
-    msglen = (rawlen - 1) << 7;
-
-    // Is this a block of net-status flags?
-    netblock = !qh.status || (qh.status == '\xff');
-
-    origArea = getshort(&qh.confLSB);
-
-    return true;
-}
-
-// Write the header to a file, except for the length:
-void qheader::output(FILE *repFile)
-{
-    qwkmsg_header qh;
-    char buf[10];
-    size_t sublen, tolen, fromlen;
-
-    sublen = strlen(subject);
-    if (sublen > 25)
-        sublen = 25;
-
-    tolen = strlen(to);
-    if (tolen > 25)
-        tolen = 25;
-
-    fromlen = strlen(from);
-    if (fromlen > 25)
-        fromlen = 25;
-
-    memset(&qh, ' ', sizeof qh);
-
-    sprintf(buf, " %-6ld", msgnum);
-    memcpy(qh.msgnum, buf, 7);
-
-    putshort(&qh.confLSB, msgnum);
-
-    if (refnum) {
-        sprintf(buf, " %-7ld", refnum);
-        memcpy(qh.refnum, buf, 8);
-    }
-    memcpy(qh.to, to, tolen);
-    memcpy(qh.from, from, fromlen);
-    memcpy(qh.subject, subject, sublen);
-
-    qh.alive = (char) 0xE1;
-
-    memcpy(qh.date, date, 8);
-    memcpy(qh.time, &date[9], 5);
-
-    if (privat)
-        qh.status = '*';
-
-    fwrite(&qh, 1, sizeof qh, repFile);
-}
-
-// Pad out with spaces, as necessary, and write the length to the header:
-void qheader::set_length(FILE *repFile, long headerpos, long curpos)
-{
-    long length;
-
-    for (length = curpos - headerpos; (length & 0x7f); length++)
-        fputc(' ', repFile);
-
-    fseek(repFile, headerpos + CHUNK_OFFSET, SEEK_SET);
-    fprintf(repFile, "%-6ld", (length >> 7));
-    fseek(repFile, headerpos + length, SEEK_SET);
-}
-
-// Return space-padded field as string, stripped and null-terminated
-void qheader::get_field(char *dest, const char *source, size_t len)
-{
-    while (len && (' ' == source[len - 1]))
-        len--;
-    memcpy(dest, source, len);
-    dest[len] = '\0';
-}
-
-
-// -----------------------------------------------------------------
 // The QWK methods
 // -----------------------------------------------------------------
 
@@ -429,6 +274,23 @@ void qwkpack::loadHeaders()
     fclose(hdrFile);
 }
 
+// Render a raw "MM-DD-YY HH:MM" QWK date with the user's DateFormat, for
+// display only. The raw form stays in qHead.date so replies round-trip
+// byte-for-byte through qheader::output(); see the note in qheader::init().
+static void qwkDispDate(char *dest, size_t destlen, const char *raw)
+{
+    struct tm t;
+    memset(&t, 0, sizeof t);
+    int mo = 0, dy = 0, yr = 0, hh = 0, mn = 0;
+    sscanf(raw, "%d-%d-%d %d:%d", &mo, &dy, &yr, &hh, &mn);
+    t.tm_mon = mo - 1;
+    t.tm_mday = dy;
+    t.tm_year = yr + ((yr < 70) ? 100 : 0);
+    t.tm_hour = hh;
+    t.tm_min = mn;
+    formatDate(dest, destlen, &t, mm.res.get(dateFormat));
+}
+
 letter_header *qwkpack::getNextLetter()
 {
     static net_address nullNet;
@@ -482,7 +344,10 @@ letter_header *qwkpack::getNextLetter()
             lsubj = csubj = hdrField(hsubj, utf8);
     }
 
-    letter_header *newLetter = new letter_header(lsubj, lto, lfrom, q.date,
+    char ddate[40];
+    qwkDispDate(ddate, sizeof ddate, q.date);
+
+    letter_header *newLetter = new letter_header(lsubj, lto, lfrom, ddate,
         0, q.refnum, letterID, q.msgnum, areaID, q.privat, q.msglen, this,
         nullNet, !(!(areas[areaID].attr & LATINCHAR)));
 
@@ -901,9 +766,12 @@ letter_header *qwkreply::getNextLetter()
     int area = ((qwkpack *) mm.packet)->
         getXNum((int) current->qHead.msgnum) + 1;
 
+    char ddate[40];
+    qwkDispDate(ddate, sizeof ddate, current->qHead.date);
+
     letter_header *newLetter = new letter_header(
         current->qHead.subject, current->qHead.to, current->qHead.from,
-        current->qHead.date, 0, current->qHead.refnum, currentLetter,
+        ddate, 0, current->qHead.refnum, currentLetter,
         currentLetter, area, current->qHead.privat,
         current->qHead.msglen, this, nullNet, mm.areaList->isLatin(area));
 

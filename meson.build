@@ -98,6 +98,7 @@ mmail_src = files(
     'mmail/omen.cc',
     'mmail/opx.cc',
     'mmail/pktbase.cc',
+    'mmail/qheader.cc',
     'mmail/qwk.cc',
     'mmail/qwkhdr.cc',
     'mmail/read.cc',
@@ -154,5 +155,6 @@ endif
 if get_option('tests')
     mm_misc_src = files('mmail/misc.cc')
     mm_qwkhdr_src = files('mmail/qwkhdr.cc')
+    mm_qheader_src = files('mmail/qheader.cc')
     subdir('tests')
 endif
