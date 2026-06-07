@@ -52,26 +52,15 @@ bool qheader::init(FILE *datFile)
     get_field(to, qh.to, 25);
     get_field(subject, qh.subject, 25);
 
-    // qh.date ("MM-DD-YY") and qh.time ("HH:MM") are ASCII; render them with
-    // the user's DateFormat instead of the packet's US m-d-y order verbatim.
-    char dbuf[9], tbuf[6];
-    memcpy(dbuf, qh.date, 8);
-    dbuf[2] = dbuf[5] = '-';        // force separators (some packets are broken)
-    dbuf[8] = '\0';
-    memcpy(tbuf, qh.time, 5);
-    tbuf[5] = '\0';
-
-    struct tm t;
-    memset(&t, 0, sizeof t);
-    int mo = 0, dy = 0, yr = 0, hh = 0, mn = 0;
-    sscanf(dbuf, "%d-%d-%d", &mo, &dy, &yr);
-    sscanf(tbuf, "%d:%d", &hh, &mn);
-    t.tm_mon = mo - 1;
-    t.tm_mday = dy;
-    t.tm_year = yr + ((yr < 70) ? 100 : 0);
-    t.tm_hour = hh;
-    t.tm_min = mn;
-    formatDate(date, sizeof date, &t, mm.res.get(dateFormat));
+    // Keep the RAW "MM-DD-YY HH:MM" here. This field is re-packed verbatim
+    // into the fixed-width QWK header by output() (the reply round-trip), so
+    // it must stay the packet's format. The user's DateFormat is applied only
+    // for display, in qwkDispDate() -- never stored back into qHead.date.
+    memcpy(date, qh.date, 8);
+    date[2] = '-';
+    date[5] = '-';        // some packets ship broken separators
+    date[8] = ' ';
+    strnzcpy(date + 9, qh.time, 5);
 
     strnzcpy(buf, qh.refnum, 8);
     refnum = atol(buf);
@@ -429,6 +418,23 @@ void qwkpack::loadHeaders()
     fclose(hdrFile);
 }
 
+// Render a raw "MM-DD-YY HH:MM" QWK date with the user's DateFormat, for
+// display only. The raw form stays in qHead.date so replies round-trip
+// byte-for-byte through qheader::output(); see the note in qheader::init().
+static void qwkDispDate(char *dest, size_t destlen, const char *raw)
+{
+    struct tm t;
+    memset(&t, 0, sizeof t);
+    int mo = 0, dy = 0, yr = 0, hh = 0, mn = 0;
+    sscanf(raw, "%d-%d-%d %d:%d", &mo, &dy, &yr, &hh, &mn);
+    t.tm_mon = mo - 1;
+    t.tm_mday = dy;
+    t.tm_year = yr + ((yr < 70) ? 100 : 0);
+    t.tm_hour = hh;
+    t.tm_min = mn;
+    formatDate(dest, destlen, &t, mm.res.get(dateFormat));
+}
+
 letter_header *qwkpack::getNextLetter()
 {
     static net_address nullNet;
@@ -482,7 +488,10 @@ letter_header *qwkpack::getNextLetter()
             lsubj = csubj = hdrField(hsubj, utf8);
     }
 
-    letter_header *newLetter = new letter_header(lsubj, lto, lfrom, q.date,
+    char ddate[40];
+    qwkDispDate(ddate, sizeof ddate, q.date);
+
+    letter_header *newLetter = new letter_header(lsubj, lto, lfrom, ddate,
         0, q.refnum, letterID, q.msgnum, areaID, q.privat, q.msglen, this,
         nullNet, !(!(areas[areaID].attr & LATINCHAR)));
 
@@ -901,9 +910,12 @@ letter_header *qwkreply::getNextLetter()
     int area = ((qwkpack *) mm.packet)->
         getXNum((int) current->qHead.msgnum) + 1;
 
+    char ddate[40];
+    qwkDispDate(ddate, sizeof ddate, current->qHead.date);
+
     letter_header *newLetter = new letter_header(
         current->qHead.subject, current->qHead.to, current->qHead.from,
-        current->qHead.date, 0, current->qHead.refnum, currentLetter,
+        ddate, 0, current->qHead.refnum, currentLetter,
         currentLetter, area, current->qHead.privat,
         current->qHead.msglen, this, nullNet, mm.areaList->isLatin(area));
 
