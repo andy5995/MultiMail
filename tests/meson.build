@@ -22,3 +22,13 @@ test(
         override_options: cpp98,
     ),
 )
+
+test(
+    'qheader',
+    executable(
+        'test_qheader',
+        files('qheader_test.cc') + mm_qheader_src + mm_misc_src,
+        include_directories: include_directories('..'),
+        override_options: cpp98,
+    ),
+)

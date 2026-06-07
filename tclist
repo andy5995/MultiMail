@@ -24,6 +24,7 @@ read.obj
 compress.obj
 pktbase.obj
 -Yo bw.obj
+qheader.obj
 qwk.obj
 qwkhdr.obj
 omen.obj
