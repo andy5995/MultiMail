@@ -76,12 +76,16 @@ area_header *qwkpack::getNextArea()
     int cMsgNum = areas[ID].nummsgs;
     bool x = (areas[ID].num == -1);
 
+    // QWKE allows 71-char To/Subject; so does a Synchronet packet that ships
+    // HEADERS.DAT (it can carry full-length headers) even when QWKE is off.
+    int hdrlen = (qwke || headers.any()) ? 71 : 25;
+
     area_header *tmp = new area_header(ID + 1, areas[ID].numA,
         areas[ID].name, (x ? "Letters addressed to you" : areas[ID].name),
         (greekqwk ? (x ? "GreekQWK personal" : "GreekQWK") : (qwke ? (x
         ? "QWKE personal" : "QWKE") : (x ? "QWK personal" : "QWK"))),
         areas[ID].attr | hasOffConfig | (cMsgNum ? ACTIVE : 0), cMsgNum,
-        0, qwke ? 71 : 25, qwke ? 71 : 25);
+        0, hdrlen, hdrlen);
 
     ID++;
     return tmp;
@@ -95,6 +99,11 @@ bool qwkpack::isQWKE()
 bool qwkpack::isGreekQWK()
 {
     return greekqwk;
+}
+
+bool qwkpack::hasHeaders()
+{
+    return headers.any();
 }
 
 bool qwkpack::externalIndex()
@@ -753,11 +762,13 @@ void qwkreply::getReplies(FILE *repFile)
 
 area_header *qwkreply::getNextArea()
 {
+    int hdrlen = (qwke || ((qwkpack *) mm.packet)->hasHeaders()) ? 71 : 25;
+
     return new area_header(0, "REPLY", "REPLIES",
         "Letters written by you", (greekqwk ? "GreekQWK replies" :
         (qwke ? "QWKE replies" : "QWK replies")),
         (COLLECTION | REPLYAREA | ACTIVE | PUBLIC | PRIVATE),
-        noOfLetters, 0, qwke ? 71 : 25, qwke ? 71 : 25);
+        noOfLetters, 0, hdrlen, hdrlen);
 }
 
 letter_header *qwkreply::getNextLetter()

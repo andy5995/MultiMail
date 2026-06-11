@@ -4,6 +4,11 @@ Revision History
 (in-progress)
 -------------
 
+- Allow 71-character To/Subject when composing QWK replies if the packet
+  ships a HEADERS.DAT, not only when QWKE is enabled -- so full-length
+  headers can be entered (and written to HEADERS.DAT) on Synchronet packets
+  with QWKE turned off.
+
 - Fixed an out-of-bounds read in the ANSI viewer (e.g. when showing a
   bulletin), which could crash the reader.
 

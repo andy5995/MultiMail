@@ -74,6 +74,7 @@ class qwkpack : public pktbase
     letter_header *getNextLetter();
     bool isQWKE();
     bool isGreekQWK();
+    bool hasHeaders();
     const char *ctrlName();
 };
 

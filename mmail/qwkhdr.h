@@ -38,6 +38,9 @@ class qwkHeaders {
     // Is there a section for this MESSAGES.DAT (byte) offset?
     bool has(unsigned long offset) const;
 
+    // Did the packet ship a non-empty HEADERS.DAT (any sections parsed)?
+    bool any() const;
+
     // Value for a key (case-insensitive) within a section, or 0 if absent.
     const char *get(unsigned long offset, const char *key) const;
 };

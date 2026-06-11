@@ -133,6 +133,11 @@ bool qwkHeaders::has(unsigned long offset) const
     return findSection(offset) != 0;
 }
 
+bool qwkHeaders::any() const
+{
+    return head != 0;
+}
+
 const char *qwkHeaders::get(unsigned long offset, const char *key) const
 {
     section *s = findSection(offset);
