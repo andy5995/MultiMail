@@ -11,3 +11,5 @@
 /out/
 *.AppImage
 *.AppImage.zsync
+
+!CLAUDE.md
