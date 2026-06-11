@@ -40,8 +40,8 @@ meson setup builddir --buildtype=release -Dstrip=true   # stripped release
   makefiles. meson only flips three feature toggles by predefining guard macros:
   `-Dvanity_plate=false` → `-DNO_VANITY_PLATE`, `-Dshadows=false` →
   `-DNO_USE_SHADOWS`, `-Dtar_kludge=false` → `-DNO_TAR_KLUDGE`. See
-  `meson_options.txt` and the guarded `#define`s in `config.h`. Run `meson fmt -eir` after editing
-  `meson.build`/`meson.options`.
+  `meson_options.txt` and the guarded `#define`s in `config.h`. Run
+  `meson fmt -eir` after editing `meson.build`/`meson_options.txt`.
 - **Adding/removing a `.cc` means editing `meson.build`'s `mmail_src`/
   `interfac_src` lists AND the legacy makefiles' object lists (`Makefile.bcc`,
   `Makefile.vc`, `Makefile.wcc`, and `tclist`).** That source-list duplication is
