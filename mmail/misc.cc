@@ -167,17 +167,50 @@ char *fullpath(const char *dir, const char *name)
     return fp;
 }
 
-// If there's a space in the string, return it quoted
+// Quote a pathname so it survives the shell as a single literal argument,
+// neutralizing spaces and metacharacters. The caller passes the result to
+// system()/mysystem(), so a path holding shell specials (from a packet name
+// or a user-configured path) must not be able to inject commands.
 char *quotespace(const char *pathname)
 {
     char *result;
-    const char *sp = strchr(pathname, ' ');
 
-    if (sp) {
-        result = new char[strlen(pathname) + 3];
-        sprintf(result, "\"%s\"", pathname);
-    } else
-        result = strdupplus(pathname);
+#ifdef DOSNAMES
+    // cmd.exe / command.com: wrap in double quotes. Inside double quotes
+    // the shell metacharacters (& | < > ( ) ; ^) are taken literally; an
+    // embedded '"' is escaped as '""'. '%' (variable expansion) cannot be
+    // reliably escaped, so it is stripped rather than left injectable.
+    result = new char[2 * strlen(pathname) + 3];
+
+    char *q = result;
+    *q++ = '\"';
+    for (const char *p = pathname; *p; p++) {
+        if ('%' == *p)
+            continue;
+        if ('\"' == *p)
+            *q++ = '\"';
+        *q++ = *p;
+    }
+    *q++ = '\"';
+    *q = '\0';
+#else
+    // POSIX /bin/sh: wrap in single quotes; the only character that can end a
+    // single-quoted run is "'" itself, replaced with the canonical '\'' .
+    result = new char[4 * strlen(pathname) + 3];
+
+    char *q = result;
+    *q++ = '\'';
+    for (const char *p = pathname; *p; p++)
+        if ('\'' == *p) {
+            *q++ = '\'';
+            *q++ = '\\';
+            *q++ = '\'';
+            *q++ = '\'';
+        } else
+            *q++ = *p;
+    *q++ = '\'';
+    *q = '\0';
+#endif
 
     return result;
 }

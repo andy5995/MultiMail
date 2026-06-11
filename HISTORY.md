@@ -4,6 +4,10 @@ Revision History
 (in-progress)
 -------------
 
+- Fixed a shell command-injection: paths and filenames are now fully quoted
+  before being passed to the external (de)compressor or editor, not just when
+  they contain a space.
+
 - Allow 71-character To/Subject when composing QWK replies if the packet
   ships a HEADERS.DAT, not only when QWKE is enabled -- so full-length
   headers can be entered (and written to HEADERS.DAT) on Synchronet packets

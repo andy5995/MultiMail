@@ -65,5 +65,39 @@ int main()
     formatDate(ds, sizeof ds, &dt, "");
     CHECK(ds[0] != '\0');
 
+    // quotespace: a single shell-safe argument, metacharacters neutralized.
+    // The POSIX form single-quotes; '\'' is the only in-quote escape.
+    char *q;
+#ifndef DOSNAMES
+    q = quotespace("plain");
+    CHECK_STR(q, "'plain'");
+    delete[] q;
+    q = quotespace("with space");
+    CHECK_STR(q, "'with space'");
+    delete[] q;
+    q = quotespace("a;rm -rf ~|b`c`$d");
+    CHECK_STR(q, "'a;rm -rf ~|b`c`$d'");
+    delete[] q;
+    q = quotespace("it's");
+    CHECK_STR(q, "'it'\\''s'");
+    delete[] q;
+    q = quotespace("");
+    CHECK_STR(q, "''");
+    delete[] q;
+#else
+    q = quotespace("plain");
+    CHECK_STR(q, "\"plain\"");
+    delete[] q;
+    q = quotespace("a&b|c");
+    CHECK_STR(q, "\"a&b|c\"");
+    delete[] q;
+    q = quotespace("a\"b");
+    CHECK_STR(q, "\"a\"\"b\"");
+    delete[] q;
+    q = quotespace("a%PATH%b");
+    CHECK_STR(q, "\"aPATHb\"");
+    delete[] q;
+#endif
+
     return mm_test_report();
 }
