@@ -1,0 +1,58 @@
+name: DOS
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md' ]
+
+jobs:
+  build:
+    name: 16-bit DOS (OpenWatcom)
+    runs-on: ubuntu-latest
+    env:
+      # Linux-hosted Watcom defaults objects to .o; the DOS makefiles expect
+      # .obj, so force the extension for every compiler driver.
+      WCC: -fo=.obj
+      WPP: -fo=.obj
+      WCC386: -fo=.obj
+      WPP386: -fo=.obj
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up OpenWatcom
+      uses: open-watcom/setup-watcom@v1
+      with:
+        version: '2.0'
+        tag: '2026-06-01-Build'
+        target: dos
+
+    - name: Check out PDCurses
+      uses: actions/checkout@v6
+      with:
+        repository: wmcbrine/PDCurses
+        ref: 2b6a9e920dc14523829b0b9495f2e3281f03cf29
+        path: PDCurses
+
+    - name: Build PDCurses (16-bit large model)
+      working-directory: PDCurses/dos
+      run: wmake -f Makefile.wcc MODEL=l RM=rm pdcurses.lib
+
+    - name: Build mm.exe
+      run: wmake -f Makefile.wcc SYS=DOS16 CURS_DIR=$PWD/PDCurses
+
+    - name: Verify DOS executable
+      run: |
+        file mm.exe
+        case "$(file -b mm.exe)" in
+          MS-DOS*) echo "OK: 16-bit DOS executable" ;;
+          *) echo "ERROR: not a DOS executable"; exit 1 ;;
+        esac
+
+    - name: Upload mm.exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: mm-dos16
+        path: mm.exe
