@@ -35,6 +35,9 @@ int main()
     CHECK(h.has(0x2b00));
     CHECK(!h.has(0x9999));
 
+    // any(): true once a non-empty HEADERS.DAT has been parsed
+    CHECK(h.any());
+
     // Full (untruncated) RFC-style ':' fields
     CHECK_STR(h.get(0x1a80, "Sender"), "Digital Man");
     CHECK_STR(h.get(0x1a80, "Recipient"), "All");
@@ -68,6 +71,7 @@ int main()
     qwkHeaders empty;
     empty.parse("");
     CHECK(!empty.has(0x1a80));
+    CHECK(!empty.any());
     empty.parse(0);
 
     // utf8ToLatin1: ASCII unchanged, Latin-1 range decoded, >0xFF -> '?'
