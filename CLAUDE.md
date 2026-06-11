@@ -30,9 +30,9 @@ meson setup builddir --buildtype=release -Dstrip=true   # stripped release
   macro like `DOSNAMES` **must `#include "../config.h"`**, or it silently compiles
   the wrong platform's expectations while the linked code does the right thing —
   exactly what broke the `misc` test on MSVC/MSYS2.
-- CI (`.github/workflows/`) builds on Linux, macOS, MSYS2 (ncurses), and MSVC
-  (PDCurses via vcpkg). Beyond `meson test`, the cross-platform bar is still
-  "compiles clean everywhere."
+- CI (`.github/workflows/`) builds on Linux, macOS, MSYS2 (ncurses), MSVC
+  (PDCurses via vcpkg), and **16-bit DOS** (`dos.yml`, OpenWatcom). Beyond
+  `meson test`, the cross-platform bar is still "compiles clean everywhere."
 - Curses is found via `dependency('curses')` with `find_library` fallbacks
   (ncursesw/ncurses/pdcurses). It's a **frontend-only** dependency — nothing in
   `mmail/` includes curses.
@@ -50,6 +50,13 @@ meson setup builddir --buildtype=release -Dstrip=true   # stripped release
   `Makefile.bcc` (Borland/Turbo C++, DOS/Win), `Makefile.wcc` (Watcom/wmake).
   `Makefile.vc` (MSVC/nmake) is redundant with the meson MSVC path and could be
   retired. They share the `depend` file (`make dep` regenerates it).
+- **`Makefile.wcc` is exercised in CI via an OpenWatcom cross-build** (`dos.yml`):
+  `SYS=DOS16` (true 16-bit, `wpp -ml`) or `SYS=DOS32` (DOS/4GW). It needs a DOS
+  PDCurses lib (`wmake -f Makefile.wcc MODEL=l` under PDCurses' `dos/`). Two
+  Linux-host quirks the build depends on: set `WCC/WPP/WCC386/WPP386=-fo=.obj`
+  (Linux-hosted Watcom emits `.o`, the makefiles want `.obj`), and the link line
+  is `file { $(MOBJS) $(IOBJS) }`, not `file *.obj` (the wildcard only works on
+  real DOS, where wlink expands it and the shell doesn't pre-glob).
 - `mm.1` is committed and current; meson installs it as-is and only regenerates
   from `MANUAL.md` if `md2man-roff` is installed. Edit `MANUAL.md`, not `mm.1`.
 

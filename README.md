@@ -1,5 +1,7 @@
 # MultiMail
 
+[![DOS](https://github.com/andy5995/MultiMail/actions/workflows/dos.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/dos.yml)
+
 MultiMail is an offline mail packet reader with a curses-based interface,
 for Unix / Linux, macOS, Windows, and other systems. It reads and replies
 to messages in the Blue Wave, QWK, OMEN, SOUP, and OPX formats.

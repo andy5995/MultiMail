@@ -63,7 +63,7 @@ ansiview.$(O) addrbook.$(O) tagline.$(O) help.$(O) main.$(O)
 all:	mm.exe
 
 mm.exe:	$(MOBJS) $(IOBJS)
-	$(LINKER) name mm.exe file *.obj libfile $(LIBS)
+	$(LINKER) name mm.exe file { $(MOBJS) $(IOBJS) } libfile $(LIBS)
 
 clean
 	del *.obj
