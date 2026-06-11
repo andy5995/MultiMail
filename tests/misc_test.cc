@@ -5,6 +5,7 @@
  Distributed under the GNU General Public License, version 3 or later. */
 
 #include "test.h"
+#include "../config.h"   // DOSNAMES -- must match what misc.cc compiles
 #include "../mmail/misc.h"
 
 int main()
