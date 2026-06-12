@@ -1,7 +1,7 @@
 project(
     'multimail',
     'cpp',
-    version: '0.52',
+    version: '0.53',
     license: 'GPL-3.0-or-later',
     meson_version: '>= 0.59.0',
     default_options: [

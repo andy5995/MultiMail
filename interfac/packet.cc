@@ -19,7 +19,7 @@ void Welcome::MakeActive()
     window->attrib(C_WELCOME2);
     window->put(3, 2, "Copyright (c) " MM_YEAR);
     window->put(3, 21, "William McBrine, Kolossvary");
-    window->put(4, 7, "Tamas, Toth Istvan, John Zero, et al.");
+    window->put(4, 2, "Tamas, Toth Istvan, John Zero, Andy Alt, et al.");
     window->touch();
 }
 

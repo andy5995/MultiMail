@@ -2,8 +2,8 @@
 #define STR(x) STRingize(x)
 
 #define MM_MAJOR 0
-#define MM_MINOR 52
-#define MM_YEAR "2021"
+#define MM_MINOR 53
+#define MM_YEAR "2026"
 
 #define MM_NAME "MultiMail"
 #define MM_SNAME "MMail"
