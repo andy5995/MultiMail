@@ -657,7 +657,7 @@ bool LetterWindow::SplitLetter(int lines)
         sprintf(maxlinesA, "%d", eachmax);
         if (!ui.savePrompt(
             "Max lines per part? (WARNING: Split is not reversible!)",
-            maxlinesA) || !sscanf(maxlinesA, "%d", &eachmax))
+            maxlinesA) || sscanf(maxlinesA, "%d", &eachmax) != 1)
 
             return false;
     }

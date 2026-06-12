@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- Cancel the "Max lines per part?" split prompt on empty input, instead of
+  silently proceeding with the previous value.
+
 - Fixed a shell command-injection: paths and filenames are now fully quoted
   before being passed to the external (de)compressor or editor, not just when
   they contain a space.
