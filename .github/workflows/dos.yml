@@ -1,8 +1,20 @@
 name: DOS
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version number'
+        required: false
+        type: string
   push:
     branches: [ master ]
+    tags:
+      - 'v*'
     paths: &shared_paths
       - '**'
       - '!**.yml'
@@ -17,6 +29,8 @@ jobs:
   build:
     name: 16-bit DOS (OpenWatcom)
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     env:
       # Linux-hosted Watcom defaults objects to .o; the DOS makefiles expect
       # .obj, so force the extension for every compiler driver.
@@ -24,6 +38,7 @@ jobs:
       WPP: -fo=.obj
       WCC386: -fo=.obj
       WPP386: -fo=.obj
+      VERSION: ${{ inputs.version }}
     steps:
     - uses: actions/checkout@v6
 
@@ -56,8 +71,53 @@ jobs:
           *) echo "ERROR: not a DOS executable"; exit 1 ;;
         esac
 
-    - name: Upload mm.exe
-      uses: actions/upload-artifact@v4
+    - name: Stage artifact
+      run: |
+        if [[ -z "${VERSION}" ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${TAG#v}"
+          else
+            VERSION="snapshot"
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+        fi
+        OUT="MultiMail-${VERSION}-dos.exe"
+        cp mm.exe "$OUT"
+        sha256sum "$OUT" > "$OUT.sha256sum"
+        echo "OUT=${OUT}" >> "$GITHUB_ENV"
+
+    - name: Upload artifact
+      if: github.ref != 'refs/heads/master'
+      uses: actions/upload-artifact@v7
       with:
-        name: mm-dos16
-        path: mm.exe
+        name: MultiMail-dos
+        path: ${{ env.OUT }}*
+        if-no-files-found: error
+
+    - name: Prerelease (master)
+      if: github.ref == 'refs/heads/master'
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "${{ env.OUT }}*"
+        body: "MultiMail Snapshot Release"
+        allowUpdates: true
+        prerelease: true
+        removeArtifacts: false
+        replacesArtifacts: true
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        tag: snapshot
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Release (tagged)
+      if: startsWith(github.ref, 'refs/tags/') || inputs.version != ''
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "${{ env.OUT }}*"
+        tag: ${{ inputs.version != '' && format('v{0}', env.VERSION) || '' }}
+        allowUpdates: true
+        prerelease: false
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        token: ${{ secrets.GITHUB_TOKEN }}
