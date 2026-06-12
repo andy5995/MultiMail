@@ -3,10 +3,15 @@ name: MSYS2
 on:
   push:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: &shared_paths
+      - '**'
+      - '!**.yml'
+      - '!**.md'
+      - '**/msys2.yml'
+
   pull_request:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: *shared_paths
 
 jobs:
   build:

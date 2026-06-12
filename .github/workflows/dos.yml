@@ -3,10 +3,15 @@ name: DOS
 on:
   push:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: &shared_paths
+      - '**'
+      - '!**.yml'
+      - '!**.md'
+      - '**/dos.yml'
+
   pull_request:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: *shared_paths
 
 jobs:
   build:
