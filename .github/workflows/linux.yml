@@ -3,18 +3,42 @@ name: Linux
 on:
   push:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: &shared_paths
+      - '**'
+      - '!**.yml'
+      - '!**.md'
+      - '**/linux.yml'
+
   pull_request:
     branches: [ master ]
-    paths-ignore: [ '**.md' ]
+    paths: *shared_paths
 
 jobs:
   build:
+    name: ${{ matrix.name }}
     strategy:
+      fail-fast: false
       matrix:
-        runner: [ ubuntu-latest, ubuntu-24.04-arm ]
+        include:
+          - name: clang + ASan/UBSan
+            cc: clang
+            cxx: clang++
+            sanitize: -Db_sanitize=address,undefined -Db_lundef=false
+            runner: ubuntu-latest
+          - name: gcc
+            cc: gcc
+            cxx: g++
+            sanitize: ''
+            runner: ubuntu-latest
+          - name: gcc (arm64)
+            cc: gcc
+            cxx: g++
+            sanitize: ''
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
       CXXFLAGS: -Werror
     steps:
     - uses: actions/checkout@v6
@@ -25,10 +49,13 @@ jobs:
         sudo apt-get install -y meson ninja-build libncurses-dev
 
     - name: Meson setup
-      run: meson setup builddir
+      run: meson setup builddir ${{ matrix.sanitize }}
 
     - name: Build
       run: meson compile -C builddir
 
     - name: Test
       run: meson test -C builddir
+      env:
+        ASAN_OPTIONS: abort_on_error=1
+        UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
