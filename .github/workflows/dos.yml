@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     name: 16-bit DOS (OpenWatcom)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # Linux-hosted Watcom defaults objects to .o; the DOS makefiles expect
       # .obj, so force the extension for every compiler driver.

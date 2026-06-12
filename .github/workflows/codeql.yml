@@ -15,7 +15,7 @@ on:
 jobs:
   analyze:
     name: Analyze (cpp)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       # required to upload the analysis results
       security-events: write

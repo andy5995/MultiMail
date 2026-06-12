@@ -24,12 +24,12 @@ jobs:
             cc: clang
             cxx: clang++
             sanitize: -Db_sanitize=address,undefined -Db_lundef=false
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - name: gcc
             cc: gcc
             cxx: g++
             sanitize: ''
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - name: gcc (arm64)
             cc: gcc
             cxx: g++

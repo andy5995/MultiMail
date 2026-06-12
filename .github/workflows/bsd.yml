@@ -32,7 +32,7 @@ jobs:
             install: |
               echo https://cdn.openbsd.org/pub/OpenBSD | sudo tee /etc/installurl
               sudo pkg_add git meson ninja pkgconf
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v6
 
