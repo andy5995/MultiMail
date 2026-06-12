@@ -406,6 +406,7 @@ void LetterWindow::EnterLetter(int replyto_area, char key)
     if (fileStat.fdate() == oldtime)
         if (ui.WarningWindow("Cancel this letter?")) {
             remove(reply_filename);
+            delete[] reply_filename;
             ui.redraw();
             return;
         }
