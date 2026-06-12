@@ -45,7 +45,7 @@ bool qheader::init(FILE *datFile)
         return false;    // bogus message
 
     strnzcpy(buf, qh.chunks, 6);
-    msglen = (atol(buf) - 1) << 7;
+    msglen = (atol(buf) - 1) * 128;
 
     privat = (qh.status == '*') || (qh.status == '+');
 

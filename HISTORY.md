@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- Fixed undefined behavior (a negative left-shift) when parsing a QWK message
+  header whose block count is zero or blank.
+
 - Cancel the "Max lines per part?" split prompt on empty input, instead of
   silently proceeding with the previous value.
 
