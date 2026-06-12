@@ -2,6 +2,7 @@
 
 [![Linux](https://github.com/andy5995/MultiMail/actions/workflows/linux.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/linux.yml)
 [![macOS](https://github.com/andy5995/MultiMail/actions/workflows/macos.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/macos.yml)
+[![BSD](https://github.com/andy5995/MultiMail/actions/workflows/bsd.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/bsd.yml)
 [![MSVC](https://github.com/andy5995/MultiMail/actions/workflows/msvc.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/msvc.yml)
 [![MSYS2](https://github.com/andy5995/MultiMail/actions/workflows/msys2.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/msys2.yml)
 [![DOS](https://github.com/andy5995/MultiMail/actions/workflows/dos.yml/badge.svg)](https://github.com/andy5995/MultiMail/actions/workflows/dos.yml)
