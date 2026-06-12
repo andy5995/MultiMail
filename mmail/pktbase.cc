@@ -141,6 +141,8 @@ int pktbase::getYNum(int area, unsigned long rawpos)
         return -1;
 
     int x, limit = areas[area].nummsgs;
+    if (lastres >= limit)
+        lastres = 0;
     for (x = 0; x < limit; x++)
         if ((unsigned long) body[area][lastres].pointer == rawpos)
             break;

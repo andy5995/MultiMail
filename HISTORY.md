@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- Fixed a crash (out-of-bounds read) when opening a packet after closing
+  another, triggered from the Personal area's message lookup.
+
 - Fixed undefined behavior (a negative left-shift) when parsing a QWK message
   header whose block count is zero or blank.
 
