@@ -34,7 +34,7 @@ jobs:
               sudo pkg_add git meson ninja pkgconf
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Start VM
       uses: cross-platform-actions/action@v1

@@ -40,7 +40,7 @@ jobs:
       WPP386: -fo=.obj
       VERSION: ${{ inputs.version }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up OpenWatcom
       uses: open-watcom/setup-watcom@v1
@@ -50,7 +50,7 @@ jobs:
         target: dos
 
     - name: Check out PDCurses
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: wmcbrine/PDCurses
         ref: 2b6a9e920dc14523829b0b9495f2e3281f03cf29
