@@ -9,6 +9,8 @@ Revision History
 
 - Fixed a memory leak when cancelling a reply being entered.
 
+- Fixed a memory leak when a packet fails to open (e.g. a corrupt archive).
+
 - Fixed undefined behavior (a negative left-shift) when parsing a QWK message
   header whose block count is zero or blank.
 

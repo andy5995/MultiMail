@@ -121,8 +121,10 @@ pktstatus mmail::selectPacket(const char *packetName)
 
         res.set(oldPacketName, packetName);
         result = uncompressFile(fpath, res.get(WorkDir), true);
-        if (result != PKT_OK)
+        if (result != PKT_OK) {
+            delete[] fpath;
             return result;
+        }
     }
 
     delete[] fpath;
