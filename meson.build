@@ -134,15 +134,14 @@ executable(
 )
 
 # mm.1 is committed and current; regenerate from MANUAL.md only when the
-# (optional) md2man-roff tool is present.
-md2man = find_program('md2man-roff', required: false)
+# (optional) go-md2man tool is present.
+md2man = find_program('go-md2man', required: false)
 if md2man.found()
     custom_target(
         'mm.1',
         input: 'MANUAL.md',
         output: 'mm.1',
-        command: [md2man, '@INPUT@'],
-        capture: true,
+        command: [md2man, '-in', '@INPUT@', '-out', '@OUTPUT@'],
         install: true,
         install_dir: join_paths(get_option('mandir'), 'man1'),
     )

@@ -58,7 +58,8 @@ meson setup builddir --buildtype=release -Dstrip=true   # stripped release
   is `file { $(MOBJS) $(IOBJS) }`, not `file *.obj` (the wildcard only works on
   real DOS, where wlink expands it and the shell doesn't pre-glob).
 - `mm.1` is committed and current; meson installs it as-is and only regenerates
-  from `MANUAL.md` if `md2man-roff` is installed. Edit `MANUAL.md`, not `mm.1`.
+  from `MANUAL.md` if `go-md2man` is installed (Arch: `extra/go-md2man`). Edit
+  `MANUAL.md`, not `mm.1`; the `docs.yml` CI job fails if they're out of sync.
 
 ## Architecture
 

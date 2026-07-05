@@ -1,0 +1,37 @@
+name: Docs
+
+on:
+  push:
+    branches: [ master ]
+    paths: &shared_paths
+      - 'MANUAL.md'
+      - 'mm.1'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [ master ]
+    paths: *shared_paths
+
+jobs:
+  manpage:
+    name: mm.1 in sync with MANUAL.md
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: stable
+
+    # Pin go-md2man so the check matches the version that generated mm.1;
+    # a distro-packaged version could format differently and false-fail.
+    - name: Install go-md2man
+      run: go install github.com/cpuguy83/go-md2man/v2@v2.0.7
+
+    - name: Regenerate mm.1 and compare
+      run: |
+        "$(go env GOPATH)/bin/go-md2man" -in MANUAL.md -out mm.1.regen
+        if ! diff -u mm.1 mm.1.regen; then
+          echo "::error file=mm.1::mm.1 is out of sync with MANUAL.md."
+          echo "Regenerate with: go-md2man -in MANUAL.md -out mm.1"
+          exit 1
+        fi
