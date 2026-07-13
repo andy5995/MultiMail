@@ -104,15 +104,15 @@ searchret LetterListWindow::oneSearch(int x, const char *item, int mode)
 void LetterListWindow::setFormat()
 {
     char topformat[50];
-    unsigned char tot, maxFromLen, maxToLen, maxSubjLen;
+    int tot, maxFromLen, maxToLen, maxSubjLen;
 
     tot = COLS - 19;
 
     // The old fixed 50/50 split (subject vs. from+to) is kept only as a
     // per-column ceiling, so long names can't crowd out the subject.
-    unsigned char ceilTot = tot - tot / 2;
-    unsigned char ceilTo = ceilTot / 2;
-    unsigned char ceilFrom = ceilTot - ceilTo;
+    int ceilTot = tot - tot / 2;
+    int ceilTo = ceilTot / 2;
+    int ceilFrom = ceilTot - ceilTo;
 
     bool showTo = mm.areaList->hasTo() && !(mm.areaList->isCollection() &&
         !mm.areaList->isReplyArea());
