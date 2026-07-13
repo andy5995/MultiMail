@@ -107,22 +107,49 @@ void LetterListWindow::setFormat()
     unsigned char tot, maxFromLen, maxToLen, maxSubjLen;
 
     tot = COLS - 19;
-    maxSubjLen = tot / 2;
-    tot -= maxSubjLen;
-    maxToLen = tot / 2;
-    maxFromLen = tot - maxToLen;
 
-    if (!mm.areaList->hasTo() || (mm.areaList->isCollection() &&
-        !mm.areaList->isReplyArea())) {
+    // The old fixed 50/50 split (subject vs. from+to) is kept only as a
+    // per-column ceiling, so long names can't crowd out the subject.
+    unsigned char ceilTot = tot - tot / 2;
+    unsigned char ceilTo = ceilTot / 2;
+    unsigned char ceilFrom = ceilTot - ceilTo;
 
-        maxSubjLen += maxToLen;
-        maxToLen = 0;
+    bool showTo = mm.areaList->hasTo() && !(mm.areaList->isCollection() &&
+        !mm.areaList->isReplyArea());
+    bool showFrom = !mm.areaList->isReplyArea();
+
+    int wideFrom = 0, wideTo = 0, n = mm.letterList->noOfActive();
+    for (int i = 0; i < n; i++) {
+        mm.letterList->gotoActive(i);
+        if (showFrom) {
+            int l = strlen(mm.letterList->getFrom());
+            if (l > wideFrom)
+                wideFrom = l;
+        }
+        if (showTo) {
+            int l = strlen(mm.letterList->getTo());
+            if (l > wideTo)
+                wideTo = l;
+        }
     }
 
-    if (mm.areaList->isReplyArea()) {
-        maxSubjLen += maxFromLen;
-        maxFromLen = 0;
+    // Each shown column gets what its content needs, floored at its header
+    // label width and capped at the ceiling; the subject takes the rest.
+    maxFromLen = 0;
+    if (showFrom) {
+        maxFromLen = wideFrom < 4 ? 4 : wideFrom;
+        if (maxFromLen > ceilFrom)
+            maxFromLen = ceilFrom;
     }
+
+    maxToLen = 0;
+    if (showTo) {
+        maxToLen = wideTo < 2 ? 2 : wideTo;
+        if (maxToLen > ceilTo)
+            maxToLen = ceilTo;
+    }
+
+    maxSubjLen = tot - maxFromLen - maxToLen;
 
     sprintf(format, "%%c%%c%%c%%6ld  %%-%d.%ds %%-%d.%ds %%-%d.%ds",
             maxFromLen, maxFromLen, maxToLen, maxToLen, maxSubjLen,

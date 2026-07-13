@@ -4,6 +4,11 @@ Revision History
 (in-progress)
 -------------
 
+- In the message list, size the From and To columns to their actual content
+  and give the leftover width to the Subject column, instead of a fixed 50/50
+  split. Long subjects (QWKE, SOUP, OMEN, or QWK with HEADERS.DAT) now use the
+  freed space when the names are short.
+
 - Fixed a crash (out-of-bounds read) when opening a packet after closing
   another, triggered from the Personal area's message lookup.
 
