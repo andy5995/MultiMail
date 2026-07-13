@@ -48,6 +48,11 @@ extern "C" {
 #include "isoconv.h"
 
 #define MINWIDTH 60
+
+// Size of the letter-list printf format string (and the header derived from
+// it). Big enough for the compiler's worst case: three "%-N.Ns" fields whose
+// int widths could each print as 11 digits.
+#define LLIST_FORMAT_LEN 96
 #ifdef VANITY_PLATE
 # define MINHINORM 19
 # define MINHIEXPERT 17
@@ -437,7 +442,7 @@ class AreaListWindow : public ListWindow
 
 class LetterListWindow : public ListWindow
 {
-    char format[50], *topline;
+    char format[LLIST_FORMAT_LEN], *topline;
 
     int NumOfItems();
     void oneLine(int);
