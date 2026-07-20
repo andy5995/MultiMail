@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- The C key (toggle console charset) now shows the new charset in a popup,
+  so the change is visible even when the current text is all ASCII.
+
 - When the external viewer (L key) is a GUI program, show a notice on the
   terminal while it is open, so mm no longer looks hung behind it.
 

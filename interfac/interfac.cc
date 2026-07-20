@@ -959,6 +959,8 @@ void Interface::KeyHandle()  // Main loop
             case 'C':
                 isoConsole = !isoConsole;
                 redraw();
+                ReportWindow(isoConsole ? "Charset: Latin-1" :
+                             "Charset: CP437");
                 break;
             case 'O':
                 switch (state) {
