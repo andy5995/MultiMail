@@ -929,6 +929,15 @@ void LetterWindow::ViewExternal()
             linelist[i]->out(fd);
         fclose(fd);
 
+        // endwin() before the notice so it prints after curses releases the
+        // terminal (mysystem() sees it's already down and skips its own). A
+        // GUI viewer otherwise leaves the terminal at a bare prompt, looking
+        // hung, until its window is closed.
+        endwin();
+        fputs("MultiMail: waiting for the external viewer to close...\n",
+              stdout);
+        fflush(stdout);
+
         mysystem2(cmd, fname);
         remove(fname);
         ui.redraw();

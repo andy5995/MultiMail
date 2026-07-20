@@ -4,6 +4,9 @@ Revision History
 (in-progress)
 -------------
 
+- When the external viewer (L key) is a GUI program, show a notice on the
+  terminal while it is open, so mm no longer looks hung behind it.
+
 - Accept UTF-8 input in editable fields (To, Subject, taglines, etc.). A
   pasted or composed character is folded to the single-byte internal encoding;
   characters that don't fit become '?'. Fixes mangled non-ASCII names like
