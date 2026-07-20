@@ -4,6 +4,11 @@ Revision History
 (in-progress)
 -------------
 
+- Accept UTF-8 input in editable fields (To, Subject, taglines, etc.). A
+  pasted or composed character is folded to the single-byte internal encoding;
+  characters that don't fit become '?'. Fixes mangled non-ASCII names like
+  "Björn Felten".
+
 - In the message list, size the From and To columns to their actual content
   and give the leftover width to the Subject column, instead of a fixed 50/50
   split. Long subjects (QWKE, SOUP, OMEN, or QWK with HEADERS.DAT) now use the

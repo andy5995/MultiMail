@@ -363,8 +363,8 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
     j = strlen(string);
     offset = (j > dwidth) ? j - dwidth : 0;
 
-    for (i = offset; i < j; i++)
-        put(y, x + i - offset, string[i]);
+    if (j > offset)
+        put(y, x, string + offset, j - offset);
     if (!string[0])
         wmove(win, y, x);
 
@@ -444,6 +444,43 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
         case ERR:
             break;
         default:
+            // A pasted or composed non-ASCII character arrives as a UTF-8
+            // multibyte sequence, one byte per inkey(). The internal model is
+            // single-byte Latin-1, so assemble the sequence and fold it to one
+            // byte (code points above 0xFF become '?'). Skipped on a CP437
+            // console, where a high byte is already a finished character.
+            if ((c & 0x80) && !isoConsole) {
+                unsigned long cp;
+                int extra;
+
+                if ((c & 0xE0) == 0xC0) {
+                    cp = c & 0x1F;
+                    extra = 1;
+                } else if ((c & 0xF0) == 0xE0) {
+                    cp = c & 0x0F;
+                    extra = 2;
+                } else if ((c & 0xF8) == 0xF0) {
+                    cp = c & 0x07;
+                    extra = 3;
+                } else {
+                    cp = '?';
+                    extra = 0;
+                }
+
+                while (extra--) {
+                    int nc = inkey();
+                    if (((unsigned char) nc & 0xC0) != 0x80) {
+                        if (nc != ERR)
+                            ungetch(nc);
+                        cp = '?';
+                        break;
+                    }
+                    cp = (cp << 6) | ((unsigned char) nc & 0x3F);
+                }
+
+                c = (cp <= 0xFF) ? (int) cp : '?';
+            }
+
             for (j = (maxlen - 1); j > i; j--)
                 tmp[j] = tmp[j - 1];
             if (i < maxlen) {
@@ -456,9 +493,21 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
         while ((i - offset) > dwidth)
             offset++;
 
-        for (j = offset; j < dwidth + offset; j++)
-            put(y, x + j - offset, (chtype) (tmp[j] ? (unsigned char) tmp[j] :
-                ACS_BOARD));
+        {
+            // Draw the visible text through the string path (mvwaddchnstr),
+            // which renders a single 8-bit byte such as Latin-1 0xF6 as its
+            // proper wide character on a UTF-8 terminal; per-cell waddch does
+            // not. Empty cells get the ACS_BOARD placeholder.
+            int vis = (int) strlen(tmp) - offset;
+            if (vis > dwidth)
+                vis = dwidth;
+            if (vis < 0)
+                vis = 0;
+            if (vis)
+                put(y, x, tmp + offset, vis);
+            for (j = vis; j < dwidth; j++)
+                put(y, x + j, ACS_BOARD);
+        }
         wmove(win, y, x + i - offset);
         update();
     }
@@ -469,8 +518,12 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
     attrib(bg_color);
 
     j = strlen(string);
-    for (i = 0; i < dwidth; i++)
-        put(y, x + i, ((i < j) ? string[i] : ' '));
+    if (j > dwidth)
+        j = dwidth;
+    if (j)
+        put(y, x, string, j);
+    for (i = j; i < dwidth; i++)
+        put(y, x + i, ' ');
 
     update();
     cursor_off();
