@@ -11,6 +11,7 @@
 #define CONVTAB_H
 
 extern bool isoConsole; // ISO8859-1 <--> CP437 (DOS) conversion?
+extern bool utf8Console; // terminal encoding is UTF-8 (from CODESET)
 
 extern const char *dos2isotab;
 extern const char *iso2dostab;

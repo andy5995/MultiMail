@@ -10,6 +10,10 @@
 #include "interfac.h"
 
 #include <locale.h>
+#ifdef HAS_LANGINFO
+# include <langinfo.h>
+# include <string.h>
+#endif
 
 const chtype *ColorArray = 0;
 time_t starttime;
@@ -77,6 +81,12 @@ void mm_mouse_get()
 int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
+
+#ifdef HAS_LANGINFO
+    utf8Console = !strcmp(nl_langinfo(CODESET), "UTF-8");
+#else
+    utf8Console = false;
+#endif
 
     while ((argc > 2) && ('-' == argv[1][0])) {
         char *resName = argv[1] + 1;

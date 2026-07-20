@@ -103,6 +103,13 @@
 # define HAS_UNISTD
 #endif
 
+/* langinfo.h / nl_langinfo(CODESET), POSIX, on the same platforms as the
+   above -- used to detect a UTF-8 terminal at runtime.
+*/
+#if !defined(__TURBOC__) && !defined(__MINGW32__) && !defined(__WATCOMC__) && !defined(_MSC_VER)
+# define HAS_LANGINFO
+#endif
+
 /* Limit allocation sizes for 16-bit systems */
 
 #ifdef SIXTEENBIT

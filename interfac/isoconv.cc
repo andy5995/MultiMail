@@ -15,6 +15,7 @@
 enum cdirtype {CC_ISOTO437, CC_437TOISO};
 
 bool isoConsole;
+bool utf8Console;
 
 const char *dos2isotab =
   "\307\374\351\342\344\340\345\347\352\353\350\357\356\354\304\305"

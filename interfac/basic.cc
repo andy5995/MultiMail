@@ -444,12 +444,13 @@ int ShadowedWin::getstring(int y, int x, char *string, int maxlen,
         case ERR:
             break;
         default:
-            // A pasted or composed non-ASCII character arrives as a UTF-8
-            // multibyte sequence, one byte per inkey(). The internal model is
-            // single-byte Latin-1, so assemble the sequence and fold it to one
-            // byte (code points above 0xFF become '?'). Skipped on a CP437
-            // console, where a high byte is already a finished character.
-            if ((c & 0x80) && !isoConsole) {
+            // On a UTF-8 terminal a pasted or composed non-ASCII character
+            // arrives as a multibyte sequence, one byte per inkey(). The
+            // internal model is single-byte Latin-1, so assemble the sequence
+            // and fold it to one byte (code points above 0xFF become '?'). On
+            // a single-byte terminal a high byte is already a finished
+            // character, so utf8Console gates this out.
+            if ((c & 0x80) && utf8Console) {
                 unsigned long cp;
                 int extra;
 
