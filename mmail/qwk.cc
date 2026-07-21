@@ -179,8 +179,22 @@ bool qwkpack::externalIndex()
                         if ((temp < 256) || (temp > endpoint)) {
                             hasNdx = false;    // use other method
                             break;
-                        } else
-                            body[x][y].pointer = temp;
+                        }
+
+                        // Range alone isn't enough: some packets ship .NDX
+                        // files whose entries point into the middle of a
+                        // message body instead of a header. Verify each
+                        // pointer lands on a parseable header; if not, fall
+                        // back to the .DAT-based index.
+
+                        qheader qHead;
+                        fseek(infile, temp - 128, SEEK_SET);
+                        if (!qHead.init(infile) || qHead.netblock) {
+                            hasNdx = false;
+                            break;
+                        }
+
+                        body[x][y].pointer = temp;
                     }
                     fclose(idxFile);
                 }

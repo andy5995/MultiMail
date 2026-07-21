@@ -4,6 +4,10 @@ Revision History
 (in-progress)
 -------------
 
+- Detect QWK packets whose .NDX entries point into a message body instead
+  of a header and fall back to indexing directly from MESSAGES.DAT, instead
+  of filling the letter list with "ERROR READING MESSAGES.DAT".
+
 - The C key (toggle console charset) now shows the new charset in a popup,
   so the change is visible even when the current text is all ASCII.
 
