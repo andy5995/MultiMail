@@ -76,7 +76,8 @@ area_header *bluewave::getNextArea()
 
     flags_raw = getshort(areas[ID].area_flags);
     flags_cooked = isPers ? (PUBLIC | PRIVATE | COLLECTION | ACTIVE) :
-        (hasOffConfig | SUBKNOWN | ((x != -1) ? ACTIVE : 0) |
+        (hasOffConfig | SUBKNOWN |
+        (((x != -1) || (flags_raw & INF_SCANNING)) ? ACTIVE : 0) |
         ((flags_raw & (INF_ALIAS_NAME | INF_ANY_NAME)) ? ALIAS : 0) |
         ((flags_raw & INF_NETMAIL) ? NETMAIL : 0) |
         (inet ? (INTERNET | LATINCHAR) : 0) |
@@ -904,7 +905,7 @@ char *bwreply::nextLine(FILE *olc)
 
     char *end = myfgets(line, sizeof line, olc);
     if (end)
-        while ((*end == '\n') || (*end == '\r'))
+        while ((end >= line) && ((*end == '\n') || (*end == '\r')))
             *end-- = '\0';
     return line;
 }

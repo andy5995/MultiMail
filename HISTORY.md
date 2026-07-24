@@ -4,6 +4,15 @@ Revision History
 (in-progress)
 -------------
 
+- Fix a crash when reopening a Blue Wave packet whose reply had subscription
+  changes: reading the saved area-change list walked off the start of the line
+  buffer on the blank lines between area entries.
+
+- Treat a Blue Wave area you are subscribed to (the INF_SCANNING flag) as
+  active, even when the packet carries no new mail for it. Before, only areas
+  with messages could be unsubscribed, so most areas could not be dropped and
+  the "Subscribed" list showed too few areas.
+
 - Fix a crash (or silent string corruption) when viewing ANSI/Avatar art
   containing an escape sequence with more than one parameter, caused by an
   overlapping strcpy in the escape-parameter parser.
