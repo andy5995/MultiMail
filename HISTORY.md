@@ -4,6 +4,10 @@ Revision History
 (in-progress)
 -------------
 
+- Fix a crash (or silent string corruption) when viewing ANSI/Avatar art
+  containing an escape sequence with more than one parameter, caused by an
+  overlapping strcpy in the escape-parameter parser.
+
 - Detect QWK packets whose .NDX entries point into a message body instead
   of a header and fall back to indexing directly from MESSAGES.DAT, instead
   of filling the letter list with "ERROR READING MESSAGES.DAT".

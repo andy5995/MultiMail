@@ -259,7 +259,7 @@ int AnsiWindow::getparm()
         if (*parm == ';') {             // more params after
             *parm++ = '\0';
             value = (parm == escparm + 1) ? 1 : atoi(escparm);
-            strcpy(escparm, parm);
+            memmove(escparm, parm, strlen(parm) + 1);
         } else {                        // last parameter
             value = atoi(escparm);
             escparm[0] = '\0';
